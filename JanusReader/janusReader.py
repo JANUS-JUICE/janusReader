@@ -45,7 +45,15 @@ def getValue(nodeList, label:str)->str:
     return elem[0].firstChild.data
     # return item
 
-def getElement(doc,label,debug:bool=True):
+def getElement(doc,label):
+    """Get a Block of a dom
+        Args:
+            doc (xml.dom): The full Object
+            label (str): The name of the tag to extract
+            
+        Returns:
+            (xml.dom) The node tree extracted
+    """
     elem=doc.getElementsByTagName(label)
     return elem[0]
 
