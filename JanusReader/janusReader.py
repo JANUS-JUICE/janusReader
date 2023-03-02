@@ -10,7 +10,7 @@ import errno
 import xml.dom.minidom as md
 from rich import box
 from rich.columns import Columns
-import inspect
+from JanusReader.vicar_head import load_header
 
 class MSG:
     """Data class for the message labelling
@@ -140,18 +140,19 @@ class JanusReader:
             with open(self.fileName, 'rb') as f:
                 lbl = str(f.read(self.label_size).decode('latin-1'))
             # print(lbl)
-            parts=[ x for x in lbl.split('  ') if x]
-            if '\x00' in parts[-1]:
-                parts.pop(-1)
-            for item in parts[1:]:
-                pt=item.split('=')
-                if pt[-1].isnumeric():
-                    val=int(pt[-1])
-                elif pt[-1].isdecimal():
-                    val = float(pt[-1])
-                else:
-                    val=pt[-1][1:-1]    
-                self.vicar[pt[0].title()]= val
+            # parts=[ x for x in lbl.split('  ') if x]
+            # if '\x00' in parts[-1]:
+            #     parts.pop(-1)
+            # for item in parts[1:]:
+            #     pt=item.split('=')
+            #     if pt[-1].isnumeric():
+            #         val=int(pt[-1])
+            #     elif pt[-1].isdecimal():
+            #         val = float(pt[-1])
+            #     else:
+            #         val=pt[-1][1:-1]    
+            #     self.vicar[pt[0].title()]= val
+            self.vicar=load_header(lbl)
         # Read the PDS4 Label
         self.labelFile=self.fileName.with_suffix('.xml')
         

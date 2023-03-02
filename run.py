@@ -21,7 +21,7 @@ except Exception as e:
     console.print(e.args[0])
     sys.exit()
     
-
+console.print(data.vicar)
 data.Show(all=True)
 
 # testFile=Path('../../DATA/SVT-1a/raw/janus_raw_sc_1_0734009714_000_13.vic')
