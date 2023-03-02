@@ -1,0 +1,9 @@
+pyproject.toml
+JanusReader/__init__.py
+JanusReader/exceptions.py
+JanusReader/janusReader.py
+JanusReader.egg-info/PKG-INFO
+JanusReader.egg-info/SOURCES.txt
+JanusReader.egg-info/dependency_links.txt
+JanusReader.egg-info/requires.txt
+JanusReader.egg-info/top_level.txt
