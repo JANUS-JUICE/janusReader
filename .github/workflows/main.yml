@@ -2,7 +2,7 @@ name: "Pull Request Docs Check"
 on: 
 - pull_request
 - push
-- workflow_dispach
+- workflow_dispatch
 
 jobs:
   docs:
