@@ -10,9 +10,9 @@ jobs:
     steps:
     
     - uses: actions/checkout@v1
-    - run: pip install furo
     - uses: ammaraskar/sphinx-action@master
       with:
+        pre-build-command: "pip install furo"
         docs-folder: "docs/"
         build-command: "sphinx-build -b html ./source ./_build"
     - uses: actions/upload-artifact@v1
