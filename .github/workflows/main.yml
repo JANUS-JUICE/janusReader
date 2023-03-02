@@ -8,8 +8,9 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-    - run: pip install furo
+    
     - uses: actions/checkout@v1
+    - run: pip install furo
     - uses: ammaraskar/sphinx-action@master
       with:
         docs-folder: "docs/"
@@ -22,7 +23,7 @@ jobs:
     - name: Commit documentation changes
       run: |
         git clone https://github.com/JANUS-JUICE/janusReader.git --branch gh-pages --single-branch gh-pages
-        cp -r docs/_build/html/* gh-pages/
+        cp -r docs/_build/* gh-pages/
         cd gh-pages
         touch .nojekyll
         git config --local user.email "action@github.com"
