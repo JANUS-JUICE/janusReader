@@ -37,4 +37,5 @@ jobs:
       with:
         branch: gh-pages
         directory: gh-pages
+        github_token: ${{ secrets.GITHUB_TOKEN }}
       
