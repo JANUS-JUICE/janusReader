@@ -15,7 +15,6 @@ Welcome to janusReader's documentation!
 
 .. toctree::
    usage
-   JanusReader
    :maxdepth: 2
    :caption: Contents:
    
