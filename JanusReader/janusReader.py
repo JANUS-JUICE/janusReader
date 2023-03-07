@@ -18,26 +18,16 @@ class MSG:
     DEBUG = "[yellow][DEBUG][/yellow]"
     ERROR = "[red][ERROR][/red]"
 
-def strfy(text:str)->str:
-    """Return a string with spaces replaced by underscores and title-cased.
 
-    Args:
-        text (str): Input string.
-
-    Returns:
-        str: Modified string
-    """
-    return text.replace('_', ' ').title()
-
-def getValue(nodeList, label:str)->str:
+def getValue(nodeList: md.Element, label: str) -> str:
     """Get the value from a tag
     
     Args:
-        nodeList (xml.dom): the xml block to evaluate
-        label (str): the name of the interested tag
+        nodelist: The xml block to evaluate
     
     Returns:
-        str: the value of the tag
+         The value of the tag
+
     """
     # for item in nodeList:
     #     print(item)
@@ -47,12 +37,17 @@ def getValue(nodeList, label:str)->str:
 
 def getElement(doc,label):
     """Get a Block of a dom
-        Args:
-            doc (xml.dom): The full Object
-            label (str): The name of the tag to extract
+    
+    Args:
+        doc (xml.dom): The full Object
+        
+        label (str): The name of the tag to extract
             
-        Returns:
-            (xml.dom) The node tree extracted
+    Returns:
+        (xml.dom) The node tree extracted
+        
+    Todo:
+        * implement OnBoard processing class
     """
     elem=doc.getElementsByTagName(label)
     return elem[0]
@@ -95,7 +90,7 @@ class JanusReader:
 
         Args:
             fileName (Path): input filename
-            cns (Console, optional): A console instance to capture output. Defaults to None.
+            cns (:obj:`Console`,optional): A console instance to capture output. Defaults to None.
         
         Attributes:
             fileName (Path): input filename

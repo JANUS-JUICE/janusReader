@@ -1,9 +1,14 @@
+"""VICAR utilities
+"""
+
 def load_header(header:str)->dict:
-    """Creates a list of (keyword,value) pairs and saves them inside the
-    VicarImage object.
-    Inputs:
-        header = the VICAR header string.
-    Side effects: the table field of the VicarImage object gets updated.
+    """Creates a list of (keyword,value) pairs and saves them inside a dictionary.
+    
+        Args:
+            header (str): header of the image
+        
+        Returns:
+            dict: header intrepretated
     """
 
     # Internal method to parse one item starting at index i
