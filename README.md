@@ -5,8 +5,8 @@
 ## Usage
 
 ```python
-import janusReader as jr
+import JanusReader as JR
 
-dat
+dat = JR("datafile.vic")
 
 ```
