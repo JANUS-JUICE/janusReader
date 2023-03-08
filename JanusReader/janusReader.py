@@ -192,14 +192,20 @@ class JanusReader:
         self.onBoardCompression=None
         self.subFrame=None
         self.Header=None
-        self.image=None
+        # self.image=None
+        flObs = getElement(doc, 'pds:File_Area_Observational')
+        img = getElement(flObs, "pds:Array_2D_Image")
+        self.Offset = int(getValue(img, "pds:offset"))
+        elem = img.getElementsByTagName("pds:Axis_Array")
+        self.Samples = int(getValue(elem[1], "pds:elements"))
+        self.Lines = int(getValue(elem[0], "pds:elements"))
         console.print(timeCoord)
 
             
         # if self.Format == "HALF":
-        #     with open(self.fileName, 'rb') as f:
-        #         f.seek(self.label_size)
-        #         self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Nl,self.Ns))
+        with open(self.fileName, 'rb') as f:
+            f.seek(self.Offset)
+            self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Lines,self.Samples))
         # np.reshape(self.image,(self.Nl,self.Ns))
         
         

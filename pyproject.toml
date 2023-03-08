@@ -10,6 +10,9 @@ authors = [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" }]
 license = {text = "GNU GPL ver3"} # or whatever license you prefer
 readme = "README.md"
 
+[tool.setuptools] 
+py-modules = ["JanusReader"]
+
 
 
 [project.optional-dependencies]

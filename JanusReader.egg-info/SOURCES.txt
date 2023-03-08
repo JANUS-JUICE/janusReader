@@ -1,0 +1,7 @@
+README.md
+pyproject.toml
+JanusReader.egg-info/PKG-INFO
+JanusReader.egg-info/SOURCES.txt
+JanusReader.egg-info/dependency_links.txt
+JanusReader.egg-info/requires.txt
+JanusReader.egg-info/top_level.txt
