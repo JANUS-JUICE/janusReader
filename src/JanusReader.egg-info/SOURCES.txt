@@ -1,0 +1,11 @@
+README.md
+pyproject.toml
+src/JanusReader/__init__.py
+src/JanusReader/exceptions.py
+src/JanusReader/janusReader.py
+src/JanusReader/vicar_head.py
+src/JanusReader.egg-info/PKG-INFO
+src/JanusReader.egg-info/SOURCES.txt
+src/JanusReader.egg-info/dependency_links.txt
+src/JanusReader.egg-info/requires.txt
+src/JanusReader.egg-info/top_level.txt

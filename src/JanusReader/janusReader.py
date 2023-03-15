@@ -100,6 +100,7 @@ class JanusReader:
             NOT_VALID_VICAR_FILE
                 The input file ``fileName`` is not ion VICAR format.
         """
+    __version__="0.1.2"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
         if console is None:
@@ -205,7 +206,7 @@ class JanusReader:
         # if self.Format == "HALF":
         with open(self.fileName, 'rb') as f:
             f.seek(self.Offset)
-            self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Lines,self.Samples))
+            self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Samples,self.Lines))
         # np.reshape(self.image,(self.Nl,self.Ns))
         
         

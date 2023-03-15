@@ -1,6 +1,6 @@
 [project]
 name = "JanusReader"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
     "numpy",
     'importlib-metadata; python_version>"3.10"',
@@ -10,8 +10,7 @@ authors = [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" }]
 license = {text = "GNU GPL ver3"} # or whatever license you prefer
 readme = "README.md"
 
-[tool.setuptools] 
-py-modules = ["JanusReader"]
+
 
 
 
