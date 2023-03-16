@@ -204,7 +204,7 @@ class JanusReader:
 
             
         # if self.Format == "HALF":
-        if self.dataDesc.lower()=='raw':
+        if self.level.lower()=='raw':
             with open(self.fileName, 'rb') as f:
                 f.seek(self.Offset)
                 self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Lines,self.Samples))
