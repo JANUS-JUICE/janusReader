@@ -7,6 +7,7 @@ from JanusReader import JanusReader as jr
 from JanusReader import MSG
 from rich.console import Console
 from rich import inspect
+import traceback
 
 
 
@@ -19,6 +20,7 @@ except FileNotFoundError as e:
     sys.exit(e.strerror)
 except Exception as e:
     console.print(e.args[0])
+    console.print(traceback.format_exc())
     sys.exit()
     
 console.print(data.vicar)

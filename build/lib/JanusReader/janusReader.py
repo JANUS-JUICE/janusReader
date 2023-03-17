@@ -105,16 +105,16 @@ class OnBoardProcessing:
         tb.add_column(style='yellow', justify='left')
         tb.add_column()
         tb.add_column()
-        tb.add_row("Bad Pixels Correction", "",str(self.badPixelCorrection))
+        tb.add_row("Bad Pixels Correction", "", self.badPixelCorrection)
         tb.add_row("Bad Pixel Map Name","", self.badPixelMapName)
-        tb.add_row("Bad Pixel Count","", str(self.badPixelCount))
+        tb.add_row("Bad Pixel Count","", self.badPixelCount)
         tb.add_section()
-        tb.add_row("DSNU Correction", "", str(self.dnsuCorrection))
+        tb.add_row("DSNU Correction", "", self.dnsuCorrection)
         tb.add_row("DSNU Map Name","", self.dnsuMapName)
         tb.add_section()
-        tb.add_row("Spike Maximum Value", "", str(self.spikeMaximumValue))
-        tb.add_row("Spike Distance","", str(self.spikeDistance))
-        tb.add_row("Spike Distance","", str(self.spikeDistance))
+        tb.add_row("Spike Maximum Value", "", self.spikeMaximumValue)
+        tb.add_row("Spike Distance","", self.spikeDistance)
+        tb.add_row("Spike Distance","", self.spikeDistance)
         return tb
 
 class JanusReader:
@@ -217,7 +217,7 @@ class JanusReader:
         
         acqPar = getElement(idObs, "juice_janus:Acquisition_Properties")
         self.AcquisitionParameter=AcquisitionParameter(acqPar)
-        obProc = getElement(idObs, "juice_janus:Onboard_Processing")
+        obProc = getElement(idObs, "juice_janus: Onboard_Processing")
         self.onBoardProcessing=OnBoardProcessing(obProc)
         self.onGroundProcessing=None
         self.HK=None
@@ -276,7 +276,7 @@ class JanusReader:
         tb.add_row("Pointing Mode", "", self.pointingMode)
         tb.add_row("Observation Identifier", "", self.obsIdentifier)
         tb.add_section()
-        # tb.add_row("On Board processing", "",str(self.onBoardProcessing))
+        tb.add_row("On Board processing", "",str(self.onBoardProcessing))
         tb.add_row("On Ground Processing","",str(self.onGroundProcessing))
         tb.add_row("HK","",str(self.HK))
         tb.add_row("Downsampling","",str(self.Downsamplig))
@@ -284,7 +284,7 @@ class JanusReader:
         tb.add_row("On Board Compression","",str(self.onBoardCompression))
         tb.add_row("SubFrame","",str(self.subFrame))
         tb.add_row("Header","", str(self.Header))
-        # tb.add_row("Image","",str(self.image))
+        tb.add_row("Image","",str(self.image))
         if all:
             col = Columns([tb, self.AcquisitionParameter.Show(), self.onBoardProcessing.Show()],expand=False)
         else:
