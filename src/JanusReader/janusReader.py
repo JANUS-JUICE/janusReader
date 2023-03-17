@@ -222,7 +222,7 @@ class JanusReader:
         self.onGroundProcessing=None
         self.HK=None
         self.Downsamplig=None
-        self.Exposure=None
+        self.Exposure = float(getValue(idObs, 'img:exposure_duration'))
         self.onBoardCompression=None
         self.subFrame=None
         self.Header=None
