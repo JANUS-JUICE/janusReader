@@ -5,7 +5,7 @@
 ## Usage
 
 ```python
-import JanusReader as JR
+from JanusReader import JanusReader as JR
 
 dat = JR("datafile.vic")
 
