@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: JanusReader
-Version: 0.4.0
+Version: 0.4.1
 Author-email: Romolo Politi <Romolo.Politi@inaf.it>
 License: GNU GPL ver3
 Description-Content-Type: text/markdown
@@ -13,7 +13,7 @@ Provides-Extra: docs
 ## Usage
 
 ```python
-import JanusReader as JR
+from JanusReader import JanusReader as JR
 
 dat = JR("datafile.vic")
 

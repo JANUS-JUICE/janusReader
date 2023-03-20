@@ -1,4 +1,7 @@
 # JanusReader
+# Version 0.4.1
+
+- fixed filter number type (str->int)
 
 # Version 0.4.0
 - add exposure field
