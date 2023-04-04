@@ -12,9 +12,11 @@ import traceback
 
 
 console=Console(record=True)
+# fileName='../../DATA2/03_-_SVT-1a/raw/janus_raw_sc_0734009714_000_13_1_0734009720_0000.vic'
+fileName='../janus-raw2cal/input/janus_raw_sc_0734009714_000_13_1_0734009720_0000.vic'
 
 try:
-    data = jr(Path('data/janus_raw_sc_0734009714_000_13_1_0734009720_0000.xml'),console=console, debug=True,vicar=True)
+    data = jr(Path(fileName),console=console, debug=True,vicar=True)
 except FileNotFoundError as e:
     console.print(f"{MSG.ERROR} {e.strerror} ({e.filename})")
     sys.exit(e.strerror)

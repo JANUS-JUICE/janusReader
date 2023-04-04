@@ -1,8 +1,9 @@
 [project]
 name = "JanusReader"
-version = "0.4.1"
+version = "0.4.2"
 dependencies = [
     "numpy",
+    "rich",
     'importlib-metadata; python_version>"3.10"',
 ]
 

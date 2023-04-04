@@ -75,8 +75,8 @@ class AcquisitionParameter:
         tb.add_row("Front Door Status", "", self.frontDoor)
         tb.add_row("Instrument Mode", "", self.instMode)
         tb.add_row("Image Session ID","", self.sessID)
-        tb.add_row("Image Number","",self.imgNum)
-        tb.add_row("Filter Number","", self.filtNumber)
+        tb.add_row("Image Number","",str(self.imgNum))
+        tb.add_row("Filter Number","", str(self.filtNumber))
         tb.add_row("Filter Name", "", self.filterName)
         tb.add_row("Filter Wheel Direction", "", self.filWheelDir)
         tb.add_row("Filter Snapin","", self.filSnapin)
@@ -132,7 +132,7 @@ class JanusReader:
             NOT_VALID_VICAR_FILE
                 The input file ``fileName`` is not ion VICAR format.
         """
-    __version__="0.1.2"
+    __version__="0.4.2"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
         if console is None:
@@ -233,7 +233,7 @@ class JanusReader:
         elem = img.getElementsByTagName("pds:Axis_Array")
         self.Samples = int(getValue(elem[1], "pds:elements"))
         self.Lines = int(getValue(elem[0], "pds:elements"))
-        console.print(timeCoord)
+        # console.print(timeCoord)
 
             
         # if self.Format == "HALF":
