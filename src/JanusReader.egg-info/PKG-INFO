@@ -1,12 +1,14 @@
 Metadata-Version: 2.1
 Name: JanusReader
-Version: 0.4.2
+Version: 0.5.0
 Author-email: Romolo Politi <Romolo.Politi@inaf.it>
 License: GNU GPL ver3
 Description-Content-Type: text/markdown
 Provides-Extra: docs
 
 # JanusReader
+
+**Current version:** 0.5.0 
 
 **janusReader** is the offical Python library to read data coming from JANUS instrument on-board the ESA mission JUICE.
 

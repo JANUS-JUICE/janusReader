@@ -91,12 +91,13 @@ class OnBoardProcessing:
         self.badPixelMapName = getValue(
             proc, 'juice_janus:bad_pixel_map_name')
         self.badPixelCount = int(getValue(proc, 'juice_janus:bad_pixel_count'))
-        self.dnsuCorrection = int(getValue(proc, 'juice_janus:dsnu_correction'))
-        self.dnsuMapName = getValue(proc, 'juice_janus:dsnu_map_name')
+        self.fpnCorrection = int(getValue(proc, 'juice_janus:fpn_correction'))
+        self.fpnMapName = getValue(proc, 'juice_janus:fpn_map_name')
         self.spikeMaximumValue = int(
             getValue(proc, 'juice_janus:spike_maximum_value'))
         self.spikeDistance = int(getValue(proc, 'juice_janus:spike_distance'))
         self.spikeCount = int(getValue(proc, 'juice_janus:spike_count'))
+        self.spikeCorrection = int(getValue(proc, 'juice_janus:spike_correction'))
     
     def Show(self):
         tb = Table(expand=False, show_header=False,
@@ -109,12 +110,13 @@ class OnBoardProcessing:
         tb.add_row("Bad Pixel Map Name","", self.badPixelMapName)
         tb.add_row("Bad Pixel Count","", str(self.badPixelCount))
         tb.add_section()
-        tb.add_row("DSNU Correction", "", str(self.dnsuCorrection))
-        tb.add_row("DSNU Map Name","", self.dnsuMapName)
+        tb.add_row("FPN Correction", "", str(self.fpnCorrection))
+        tb.add_row("FPN Map Name","", self.fpnMapName)
         tb.add_section()
         tb.add_row("Spike Maximum Value", "", str(self.spikeMaximumValue))
         tb.add_row("Spike Distance","", str(self.spikeDistance))
         tb.add_row("Spike Distance","", str(self.spikeDistance))
+        tb.add_row("Spike Correction","", str(self.spikeCorrection))
         return tb
 
 class JanusReader:

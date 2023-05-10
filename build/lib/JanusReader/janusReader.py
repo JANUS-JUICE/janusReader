@@ -57,8 +57,8 @@ class AcquisitionParameter:
         self.frontDoor = getValue(acq, "juice_janus:front_door_status")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
-        self.imgNum = getValue(acq, 'juice_janus:image_number')
-        self.filtNumber = getValue(acq, "juice_janus:filter_number")
+        self.imgNum = int(getValue(acq, 'juice_janus:image_number'))
+        self.filtNumber = int(getValue(acq, "juice_janus:filter_number"))
         self.filterName = getValue(acq, "juice_janus:filter_name")
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
         self.filSnapin = getValue(acq, "juice_janus:filter_snapin")
@@ -75,8 +75,8 @@ class AcquisitionParameter:
         tb.add_row("Front Door Status", "", self.frontDoor)
         tb.add_row("Instrument Mode", "", self.instMode)
         tb.add_row("Image Session ID","", self.sessID)
-        tb.add_row("Image Number","",self.imgNum)
-        tb.add_row("Filter Number","", self.filtNumber)
+        tb.add_row("Image Number","",str(self.imgNum))
+        tb.add_row("Filter Number","", str(self.filtNumber))
         tb.add_row("Filter Name", "", self.filterName)
         tb.add_row("Filter Wheel Direction", "", self.filWheelDir)
         tb.add_row("Filter Snapin","", self.filSnapin)
@@ -91,12 +91,13 @@ class OnBoardProcessing:
         self.badPixelMapName = getValue(
             proc, 'juice_janus:bad_pixel_map_name')
         self.badPixelCount = int(getValue(proc, 'juice_janus:bad_pixel_count'))
-        self.dnsuCorrection = int(getValue(proc, 'juice_janus:dsnu_correction'))
-        self.dnsuMapName = getValue(proc, 'juice_janus:dsnu_map_name')
+        self.fpnCorrection = int(getValue(proc, 'juice_janus:fpn_correction'))
+        self.fpnMapName = getValue(proc, 'juice_janus:fpn_map_name')
         self.spikeMaximumValue = int(
             getValue(proc, 'juice_janus:spike_maximum_value'))
         self.spikeDistance = int(getValue(proc, 'juice_janus:spike_distance'))
         self.spikeCount = int(getValue(proc, 'juice_janus:spike_count'))
+        self.spikeCorrection = int(getValue(proc, 'juice_janus:spike_correction'))
     
     def Show(self):
         tb = Table(expand=False, show_header=False,
@@ -109,12 +110,13 @@ class OnBoardProcessing:
         tb.add_row("Bad Pixel Map Name","", self.badPixelMapName)
         tb.add_row("Bad Pixel Count","", str(self.badPixelCount))
         tb.add_section()
-        tb.add_row("DSNU Correction", "", str(self.dnsuCorrection))
-        tb.add_row("DSNU Map Name","", self.dnsuMapName)
+        tb.add_row("FPN Correction", "", str(self.fpnCorrection))
+        tb.add_row("FPN Map Name","", self.fpnMapName)
         tb.add_section()
         tb.add_row("Spike Maximum Value", "", str(self.spikeMaximumValue))
         tb.add_row("Spike Distance","", str(self.spikeDistance))
         tb.add_row("Spike Distance","", str(self.spikeDistance))
+        tb.add_row("Spike Correction","", str(self.spikeCorrection))
         return tb
 
 class JanusReader:
@@ -132,7 +134,7 @@ class JanusReader:
             NOT_VALID_VICAR_FILE
                 The input file ``fileName`` is not ion VICAR format.
         """
-    __version__="0.1.2"
+    __version__="0.4.2"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
         if console is None:
@@ -222,7 +224,7 @@ class JanusReader:
         self.onGroundProcessing=None
         self.HK=None
         self.Downsamplig=None
-        self.Exposure = getValue(idObs, 'img:exposure_duration')
+        self.Exposure = float(getValue(idObs, 'img:exposure_duration'))
         self.onBoardCompression=None
         self.subFrame=None
         self.Header=None
@@ -233,7 +235,7 @@ class JanusReader:
         elem = img.getElementsByTagName("pds:Axis_Array")
         self.Samples = int(getValue(elem[1], "pds:elements"))
         self.Lines = int(getValue(elem[0], "pds:elements"))
-        console.print(timeCoord)
+        # console.print(timeCoord)
 
             
         # if self.Format == "HALF":
