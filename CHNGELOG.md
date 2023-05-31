@@ -1,4 +1,19 @@
 # JanusReader
+
+# Version 0.7.0
+
+- add product version number 
+- add InstrumentState class (HK)
+
+# Version 0.6.1
+
+- disabled debug options
+
+# Version 0.6.0
+
+- fix the binary read of raw file (oversize issue)
+- introduced SubFrame Class
+
 # Version 0.5.0
 
 - Changed some keyword to adatp to the datamodel version 1.14

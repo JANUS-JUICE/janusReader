@@ -35,7 +35,7 @@ def getValue(nodeList: md.Element, label: str) -> str:
     return elem[0].firstChild.data
     # return item
 
-def getElement(doc,label):
+def getElement(doc,label,el=0)->md.Element:
     """Get a Block of a dom
     
     Args:
@@ -50,7 +50,39 @@ def getElement(doc,label):
         * implement OnBoard processing class
     """
     elem=doc.getElementsByTagName(label)
-    return elem[0]
+    return elem[el]
+
+class State:
+    def __init__(self,item):
+        self.name = getValue(item, 'img:device_name').lower()
+        self.value = float(getValue(item, 'img:temperature_value'))
+        
+        self.unit = getElement(item, 'img:temperature_value').getAttribute('unit')
+
+class InstrumentState:
+    def __init__(self,stat):
+        elem = stat.getElementsByTagName("img:Device_Temperature")
+        self.states=[]
+        for item in elem:
+            self.states.append(State(item))
+    
+    def Get(self,name:str):
+        for item in self.states:
+            if item.name == name.lower():
+                return item.value
+        return None    
+    
+    def Show(self):
+        tb = Table(expand=False, show_header=False,
+                   show_lines=False, box=box.SIMPLE_HEAD,
+                   title="Instrument State", title_style="italic yellow")
+        tb.add_column(style='yellow', justify='left')
+        tb.add_column()
+        tb.add_column()
+        for item in self.states:
+            tb.add_row(' '.join(item.name.split('_')).title(),'',f"{item.value} {item.unit}")
+        return tb
+        
 
 class AcquisitionParameter:
     def __init__(self, acq):
@@ -82,7 +114,29 @@ class AcquisitionParameter:
         tb.add_row("Filter Snapin","", self.filSnapin)
         tb.add_row("Multifilter","", str(self.multifilter))
         return tb
-        
+
+class SubFrame:
+    def __init__(self,proc) -> None:
+        self.firstLine = int(getValue(proc, 'img:first_line'))
+        self.firstSample = int(getValue(proc, 'img:first_sample'))
+        self.lines = int(getValue(proc, 'img:lines'))
+        self.samples = int(getValue(proc, 'img:samples'))
+        self.subFrameType = getValue(proc, 'img:subframe_type')
+    
+    def Show(self):
+        tb = Table(expand=False, show_header=False,
+                   show_lines=False, box=box.SIMPLE_HEAD,
+                   title="SubFrame Parameters", title_style="italic yellow")
+        tb.add_column(style='yellow', justify='left')
+        tb.add_column()
+        tb.add_column()
+        tb.add_row("First Sample", "", str(self.firstSample))
+        tb.add_row("First Line", "", str(self.firstLine))
+        tb.add_row("Sample", "", str(self.samples))
+        tb.add_row("Lines", "", str(self.lines))
+        tb.add_row("Subframe Type", "", self.subFrameType)
+        return tb
+      
 class OnBoardProcessing:
     
     def __init__(self,proc):
@@ -134,7 +188,7 @@ class JanusReader:
             NOT_VALID_VICAR_FILE
                 The input file ``fileName`` is not ion VICAR format.
         """
-    __version__="0.4.2"
+    __version__="0.7.0"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
         if console is None:
@@ -189,6 +243,8 @@ class JanusReader:
         doc = md.parse(self.labelFile.as_posix())
         idArea=getElement(doc, 'pds:Identification_Area')
         self.title=getValue(idArea,'pds:title')
+        idModification = getElement(idArea, 'pds:Modification_Detail',-1)
+        self.prodVersion = getValue(idModification, 'pds:version_id')
         idObs = getElement(doc, 'pds:Observation_Area')
         if idObs.childNodes[1].nodeName == 'pds:comment':
             self.dataDesc = idObs.childNodes[1].firstChild.nodeValue
@@ -226,10 +282,13 @@ class JanusReader:
         self.Downsamplig=None
         self.Exposure = float(getValue(idObs, 'img:exposure_duration'))
         self.onBoardCompression=None
-        self.subFrame=None
+        self.subFrame = SubFrame(getElement(doc, 'img:Subframe'))
         self.Header=None
+        self.instrumentState = InstrumentState(
+            getElement(doc, 'img:Instrument_State'))
         # self.image=None
         flObs = getElement(doc, 'pds:File_Area_Observational')
+        self.creationDate = getValue(flObs, 'pds:creation_date_time')
         img = getElement(flObs, "pds:Array_2D_Image")
         self.Offset = int(getValue(img, "pds:offset"))
         elem = img.getElementsByTagName("pds:Axis_Array")
@@ -242,7 +301,8 @@ class JanusReader:
         if self.level.lower()=='raw':
             with open(self.fileName, 'rb') as f:
                 f.seek(self.Offset)
-                self.image=np.reshape(np.frombuffer(f.read(), dtype=np.uint16),(self.Lines,self.Samples))
+                self.image = np.reshape(np.frombuffer(f.read(
+                    self.Lines * self.Samples * 2), dtype=np.uint16), (self.Lines, self.Samples))
         else:
             with open(self.fileName, 'rb') as f:
                 self.image = np.reshape(np.frombuffer(
@@ -251,7 +311,7 @@ class JanusReader:
         # np.reshape(self.image,(self.Nl,self.Ns))
         
         
-    def Show(self, all:bool=False):
+    def Show(self,all:bool=False):
         """Print the contents of the VICAR file Label to the console.
         """     
         tb=Table(expand=False, show_header=False, show_lines=False, box=box.SIMPLE_HEAD,
@@ -284,11 +344,10 @@ class JanusReader:
         tb.add_row("Downsampling","",str(self.Downsamplig))
         tb.add_row("Exposure","",str(self.Exposure))
         tb.add_row("On Board Compression","",str(self.onBoardCompression))
-        tb.add_row("SubFrame","",str(self.subFrame))
         tb.add_row("Header","", str(self.Header))
         # tb.add_row("Image","",str(self.image))
         if all:
-            col = Columns([tb, self.AcquisitionParameter.Show(), self.onBoardProcessing.Show()],expand=False)
+            col = Columns([tb, self.AcquisitionParameter.Show(), self.onBoardProcessing.Show(), self.subFrame.Show(),self.instrumentState.Show()],expand=False)
         else:
             col = tb
         self.console.print(Panel(col ,title=f"Label for {self.fileName.name}", border_style='yellow', expand=False))
