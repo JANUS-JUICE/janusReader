@@ -12,14 +12,17 @@ from rich import box
 from rich.columns import Columns
 from JanusReader.vicar_head import load_header
 
+console = Console() # to be reused below
+
 class MSG:
     """Data class for the message labelling
     """
     DEBUG = "[yellow][DEBUG][/yellow]"
+    WARNING = "[orange][WARNING][/orange]"
     ERROR = "[red][ERROR][/red]"
 
 
-def getValue(nodeList: md.Element, label: str) -> str:
+def getValue(nodeList: md.Element, label: str, type=None) -> str:
     """Get the value from a tag
     
     Args:
@@ -32,8 +35,15 @@ def getValue(nodeList: md.Element, label: str) -> str:
     # for item in nodeList:
     #     print(item)
     elem = nodeList.getElementsByTagName(label)
-    return elem[0].firstChild.data
-    # return item
+    if len(elem) != 1:
+        console.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
+        return None
+
+    data =elem[0].firstChild.data
+    if type:
+        return type(data)
+
+    return data
 
 def getElement(doc,label,el=0)->md.Element:
     """Get a Block of a dom
@@ -55,7 +65,7 @@ def getElement(doc,label,el=0)->md.Element:
 class State:
     def __init__(self,item):
         self.name = getValue(item, 'img:device_name').lower()
-        self.value = float(getValue(item, 'img:temperature_value'))
+        self.value = getValue(item, 'img:temperature_value', float)
         
         self.unit = getElement(item, 'img:temperature_value').getAttribute('unit')
 
@@ -89,8 +99,8 @@ class AcquisitionParameter:
         self.frontDoor = getValue(acq, "juice_janus:front_door_status")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
-        self.imgNum = int(getValue(acq, 'juice_janus:image_number'))
-        self.filtNumber = int(getValue(acq, "juice_janus:filter_number"))
+        self.imgNum = getValue(acq, 'juice_janus:image_number', int)
+        self.filtNumber = getValue(acq, "juice_janus:filter_number", int)
         self.filterName = getValue(acq, "juice_janus:filter_name")
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
         self.filSnapin = getValue(acq, "juice_janus:filter_snapin")
@@ -117,10 +127,10 @@ class AcquisitionParameter:
 
 class SubFrame:
     def __init__(self,proc) -> None:
-        self.firstLine = int(getValue(proc, 'img:first_line'))
-        self.firstSample = int(getValue(proc, 'img:first_sample'))
-        self.lines = int(getValue(proc, 'img:lines'))
-        self.samples = int(getValue(proc, 'img:samples'))
+        self.firstLine = getValue(proc, 'img:first_line', int)
+        self.firstSample = getValue(proc, 'img:first_sample', int)
+        self.lines = getValue(proc, 'img:lines', int)
+        self.samples = getValue(proc, 'img:samples', int)
         self.subFrameType = getValue(proc, 'img:subframe_type')
     
     def Show(self):
@@ -140,18 +150,17 @@ class SubFrame:
 class OnBoardProcessing:
     
     def __init__(self,proc):
-        self.badPixelCorrection = int(getValue(
-            proc, 'juice_janus:bad_pixel_correction'))
+        self.badPixelCorrection = getValue(
+            proc, 'juice_janus:bad_pixel_correction', int)
         self.badPixelMapName = getValue(
             proc, 'juice_janus:bad_pixel_map_name')
-        self.badPixelCount = int(getValue(proc, 'juice_janus:bad_pixel_count'))
-        self.fpnCorrection = int(getValue(proc, 'juice_janus:fpn_correction'))
+        self.badPixelCount = getValue(proc, 'juice_janus:bad_pixel_count', int)
+        self.fpnCorrection = getValue(proc, 'juice_janus:fpn_correction', int)
         self.fpnMapName = getValue(proc, 'juice_janus:fpn_map_name')
-        self.spikeMaximumValue = int(
-            getValue(proc, 'juice_janus:spike_maximum_value'))
-        self.spikeDistance = int(getValue(proc, 'juice_janus:spike_distance'))
-        self.spikeCount = int(getValue(proc, 'juice_janus:spike_count'))
-        self.spikeCorrection = int(getValue(proc, 'juice_janus:spike_correction'))
+        self.spikeMaximumValue = getValue(proc, 'juice_janus:spike_maximum_value', int)
+        self.spikeDistance = getValue(proc, 'juice_janus:spike_distance', int)
+        self.spikeCount = getValue(proc, 'juice_janus:spike_count', int)
+        self.spikeCorrection = getValue(proc, 'juice_janus:spike_correction', int)
     
     def Show(self):
         tb = Table(expand=False, show_header=False,
@@ -280,7 +289,7 @@ class JanusReader:
         self.onGroundProcessing=None
         self.HK=None
         self.Downsamplig=None
-        self.Exposure = float(getValue(idObs, 'img:exposure_duration'))
+        self.Exposure = getValue(idObs, 'img:exposure_duration', float)
         self.onBoardCompression=None
         self.subFrame = SubFrame(getElement(doc, 'img:Subframe'))
         self.Header=None
@@ -290,10 +299,10 @@ class JanusReader:
         flObs = getElement(doc, 'pds:File_Area_Observational')
         self.creationDate = getValue(flObs, 'pds:creation_date_time')
         img = getElement(flObs, "pds:Array_2D_Image")
-        self.Offset = int(getValue(img, "pds:offset"))
+        self.Offset = getValue(img, "pds:offset", int)
         elem = img.getElementsByTagName("pds:Axis_Array")
-        self.Samples = int(getValue(elem[1], "pds:elements"))
-        self.Lines = int(getValue(elem[0], "pds:elements"))
+        self.Samples = getValue(elem[1], "pds:elements",int)
+        self.Lines = getValue(elem[0], "pds:elements", int)
         # console.print(timeCoord)
 
             
