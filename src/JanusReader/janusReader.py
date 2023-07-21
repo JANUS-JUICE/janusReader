@@ -12,13 +12,14 @@ from rich import box
 from rich.columns import Columns
 from JanusReader.vicar_head import load_header
 
-console = Console() # to be reused below
+# will be created on demand only if required
+# console = Console() # to be reused below
 
 class MSG:
     """Data class for the message labelling
     """
-    DEBUG = "[yellow][DEBUG][/yellow]"
-    WARNING = "[orange][WARNING][/orange]"
+    DEBUG = "[blue][DEBUG][/blue]"
+    WARNING = "[yellow][WARNING][/yellow]"
     ERROR = "[red][ERROR][/red]"
 
 
@@ -35,14 +36,25 @@ def getValue(nodeList: md.Element, label: str, type=None) -> str:
     # for item in nodeList:
     #     print(item)
     elem = nodeList.getElementsByTagName(label)
+    # try: console
+    # except:
+    #     from JanusReader.console import console
     if len(elem) == 0:
-        console.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
+        cons.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
         return None
 
     elif len(elem) > 1:
-        console.print(f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen.")
+        cons.print(f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen.")
         
     data =elem[0].firstChild.data
+    #
+    # Auto identification
+    #
+    # if data.isdigit():
+    #     data=int(data)
+    # elif data.replace('.', '', 1).isdigit() and data.count('.') < 2:
+    #     data=float(data)
+    #
     if type:
         return type(data)
 
@@ -203,8 +215,11 @@ class JanusReader:
     __version__="0.7.0"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
+        global cons # the variable will be global for the module
         if console is None:
-            console=Console()
+            cons=Console()
+        else:
+            cons=console
         self.console=console
         # Check the file type, is str convert to Path
         if type(fileName) is not Path:
