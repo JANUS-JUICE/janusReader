@@ -35,10 +35,13 @@ def getValue(nodeList: md.Element, label: str, type=None) -> str:
     # for item in nodeList:
     #     print(item)
     elem = nodeList.getElementsByTagName(label)
-    if len(elem) != 1:
+    if len(elem) == 0:
         console.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
         return None
 
+    elif len(elem) > 1:
+        console.print(f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen.")
+        
     data =elem[0].firstChild.data
     if type:
         return type(data)
