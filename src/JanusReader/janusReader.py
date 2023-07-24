@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Type
 from rich.table import Table
 from rich import print
 from rich.panel import Panel
@@ -23,14 +24,16 @@ class MSG:
     ERROR = "[red][ERROR][/red]"
 
 
-def getValue(nodeList: md.Element, label: str, type=None) -> str:
+def getValue(nodeList: md.Element, label: str, type: Type = None) -> str:
     """Get the value from a tag
     
     Args:
         nodelist: The xml block to evaluate
+        label: The name of the tag to extract
+        type: The type of the value to return (will be casted if type is not None)
     
     Returns:
-         The value of the tag
+         The value of the tag, appropriately casted if type is not None
 
     """
     # for item in nodeList:
