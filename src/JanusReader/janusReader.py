@@ -271,7 +271,7 @@ class JanusReader:
                 # we need to repeat label reading as above after computing the offset
                 # as this duplicates code we should refactor this to a single function.
                 cons.print(f"{MSG.DEBUG} The vicar file has labels at the end of the file.")
-                next_labels_offset = (self.vicar.get("LBLSIZE") +
+                next_labels_offset = (self.vicar["LBLSIZE"] +
                                       self.vicar["RECSIZE"] *
                                       self.vicar["NLB"] +
                                       self.vicar["RECSIZE"] *
