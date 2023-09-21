@@ -12,10 +12,14 @@ from rich import box
 from rich.columns import Columns
 from JanusReader.vicar_head import load_header
 
+# will be created on demand only if required
+# console = Console() # to be reused below
+
 class MSG:
     """Data class for the message labelling
     """
-    DEBUG = "[yellow][DEBUG][/yellow]"
+    DEBUG = "[blue][DEBUG][/blue]"
+    WARNING = "[yellow][WARNING][/yellow]"
     ERROR = "[red][ERROR][/red]"
 
 
@@ -24,16 +28,39 @@ def getValue(nodeList: md.Element, label: str) -> str:
     
     Args:
         nodelist: The xml block to evaluate
+        label: The name of the tag to extract
+        type: The type of the value to return (will be casted if type is not None)
     
     Returns:
-         The value of the tag
+         The value of the tag, appropriately casted if type is not None
 
     """
     # for item in nodeList:
     #     print(item)
     elem = nodeList.getElementsByTagName(label)
-    return elem[0].firstChild.data
-    # return item
+    # try: console
+    # except:
+    #     from JanusReader.console import console
+    if len(elem) == 0:
+        cons.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
+        return None
+
+    elif len(elem) > 1:
+        cons.print(f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen.")
+        
+    data =elem[0].firstChild.data
+    #
+    # Auto identification
+    #
+    if data.isdigit():
+        data=int(data)
+    elif data.replace('.', '', 1).isdigit() and data.count('.') < 2:
+        data=float(data)
+    #
+    # if type:
+    #     return type(data)
+
+    return data
 
 def getElement(doc,label,el=0)->md.Element:
     """Get a Block of a dom
@@ -55,7 +82,7 @@ def getElement(doc,label,el=0)->md.Element:
 class State:
     def __init__(self,item):
         self.name = getValue(item, 'img:device_name').lower()
-        self.value = float(getValue(item, 'img:temperature_value'))
+        self.value = getValue(item, 'img:temperature_value')
         
         self.unit = getElement(item, 'img:temperature_value').getAttribute('unit')
 
@@ -89,8 +116,8 @@ class AcquisitionParameter:
         self.frontDoor = getValue(acq, "juice_janus:front_door_status")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
-        self.imgNum = int(getValue(acq, 'juice_janus:image_number'))
-        self.filtNumber = int(getValue(acq, "juice_janus:filter_number"))
+        self.imgNum = getValue(acq, 'juice_janus:image_number')
+        self.filtNumber = getValue(acq, "juice_janus:filter_number")
         self.filterName = getValue(acq, "juice_janus:filter_name")
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
         self.filSnapin = getValue(acq, "juice_janus:filter_snapin")
@@ -117,10 +144,10 @@ class AcquisitionParameter:
 
 class SubFrame:
     def __init__(self,proc) -> None:
-        self.firstLine = int(getValue(proc, 'img:first_line'))
-        self.firstSample = int(getValue(proc, 'img:first_sample'))
-        self.lines = int(getValue(proc, 'img:lines'))
-        self.samples = int(getValue(proc, 'img:samples'))
+        self.firstLine = getValue(proc, 'img:first_line')
+        self.firstSample = getValue(proc, 'img:first_sample')
+        self.lines = getValue(proc, 'img:lines')
+        self.samples = getValue(proc, 'img:samples')
         self.subFrameType = getValue(proc, 'img:subframe_type')
     
     def Show(self):
@@ -140,18 +167,17 @@ class SubFrame:
 class OnBoardProcessing:
     
     def __init__(self,proc):
-        self.badPixelCorrection = int(getValue(
-            proc, 'juice_janus:bad_pixel_correction'))
+        self.badPixelCorrection = getValue(
+            proc, 'juice_janus:bad_pixel_correction')
         self.badPixelMapName = getValue(
             proc, 'juice_janus:bad_pixel_map_name')
-        self.badPixelCount = int(getValue(proc, 'juice_janus:bad_pixel_count'))
-        self.fpnCorrection = int(getValue(proc, 'juice_janus:fpn_correction'))
+        self.badPixelCount = getValue(proc, 'juice_janus:bad_pixel_count')
+        self.fpnCorrection = getValue(proc, 'juice_janus:fpn_correction')
         self.fpnMapName = getValue(proc, 'juice_janus:fpn_map_name')
-        self.spikeMaximumValue = int(
-            getValue(proc, 'juice_janus:spike_maximum_value'))
-        self.spikeDistance = int(getValue(proc, 'juice_janus:spike_distance'))
-        self.spikeCount = int(getValue(proc, 'juice_janus:spike_count'))
-        self.spikeCorrection = int(getValue(proc, 'juice_janus:spike_correction'))
+        self.spikeMaximumValue = getValue(proc, 'juice_janus:spike_maximum_value')
+        self.spikeDistance = getValue(proc, 'juice_janus:spike_distance')
+        self.spikeCount = getValue(proc, 'juice_janus:spike_count')
+        self.spikeCorrection = getValue(proc, 'juice_janus:spike_correction')
     
     def Show(self):
         tb = Table(expand=False, show_header=False,
@@ -188,11 +214,14 @@ class JanusReader:
             NOT_VALID_VICAR_FILE
                 The input file ``fileName`` is not ion VICAR format.
         """
-    __version__="0.7.0"
+    __version__="0.8.0"
     def __init__(self, fileName:Path, console:Console=None,debug:bool=False,vicar:bool=False):
         # Check if console exists, if not create one
+        global cons # the variable will be global for the module
         if console is None:
-            console=Console()
+            cons=Console()
+        else:
+            cons=console
         self.console=console
         # Check the file type, is str convert to Path
         if type(fileName) is not Path:
@@ -223,19 +252,6 @@ class JanusReader:
             self.label_size = int(l[8:iblank])
             with open(self.fileName, 'rb') as f:
                 lbl = str(f.read(self.label_size).decode('latin-1'))
-            # print(lbl)
-            # parts=[ x for x in lbl.split('  ') if x]
-            # if '\x00' in parts[-1]:
-            #     parts.pop(-1)
-            # for item in parts[1:]:
-            #     pt=item.split('=')
-            #     if pt[-1].isnumeric():
-            #         val=int(pt[-1])
-            #     elif pt[-1].isdecimal():
-            #         val = float(pt[-1])
-            #     else:
-            #         val=pt[-1][1:-1]    
-            #     self.vicar[pt[0].title()]= val
             self.vicar=load_header(lbl)
         # Read the PDS4 Label
         self.labelFile=self.fileName.with_suffix('.xml')
@@ -280,7 +296,7 @@ class JanusReader:
         self.onGroundProcessing=None
         self.HK=None
         self.Downsamplig=None
-        self.Exposure = float(getValue(idObs, 'img:exposure_duration'))
+        self.Exposure = getValue(idObs, 'img:exposure_duration', float)
         self.onBoardCompression=None
         self.subFrame = SubFrame(getElement(doc, 'img:Subframe'))
         self.Header=None
@@ -290,10 +306,10 @@ class JanusReader:
         flObs = getElement(doc, 'pds:File_Area_Observational')
         self.creationDate = getValue(flObs, 'pds:creation_date_time')
         img = getElement(flObs, "pds:Array_2D_Image")
-        self.Offset = int(getValue(img, "pds:offset"))
+        self.Offset = getValue(img, "pds:offset", int)
         elem = img.getElementsByTagName("pds:Axis_Array")
-        self.Samples = int(getValue(elem[1], "pds:elements"))
-        self.Lines = int(getValue(elem[0], "pds:elements"))
+        self.Samples = getValue(elem[1], "pds:elements",int)
+        self.Lines = getValue(elem[0], "pds:elements", int)
         # console.print(timeCoord)
 
             
@@ -308,7 +324,6 @@ class JanusReader:
                 self.image = np.reshape(np.frombuffer(
                     f.read(), dtype=np.float32), (self.Lines, self.Samples))
             
-        # np.reshape(self.image,(self.Nl,self.Ns))
         
         
     def Show(self,all:bool=False):
@@ -338,16 +353,15 @@ class JanusReader:
         tb.add_row("Pointing Mode", "", self.pointingMode)
         tb.add_row("Observation Identifier", "", self.obsIdentifier)
         tb.add_section()
-        # tb.add_row("On Board processing", "",str(self.onBoardProcessing))
         tb.add_row("On Ground Processing","",str(self.onGroundProcessing))
         tb.add_row("HK","",str(self.HK))
         tb.add_row("Downsampling","",str(self.Downsamplig))
         tb.add_row("Exposure","",str(self.Exposure))
         tb.add_row("On Board Compression","",str(self.onBoardCompression))
         tb.add_row("Header","", str(self.Header))
-        # tb.add_row("Image","",str(self.image))
         if all:
             col = Columns([tb, self.AcquisitionParameter.Show(), self.onBoardProcessing.Show(), self.subFrame.Show(),self.instrumentState.Show()],expand=False)
         else:
             col = tb
         self.console.print(Panel(col ,title=f"Label for {self.fileName.name}", border_style='yellow', expand=False))
+        
