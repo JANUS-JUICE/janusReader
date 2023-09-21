@@ -1,16 +1,28 @@
 Metadata-Version: 2.1
 Name: JanusReader
-Version: 0.7.0
-Author-email: Romolo Politi <Romolo.Politi@inaf.it>
+Version: 0.8.0
+Author-email: Romolo Politi <Romolo.Politi@inaf.it>, Luca Penasa <Luca.Penasa@inaf.it>
 License: GNU GPL ver3
+Project-URL: Repository, https://github.com/JANUS-JUICE/janusReader
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
 Description-Content-Type: text/markdown
+Requires-Dist: numpy
+Requires-Dist: rich
+Requires-Dist: importlib-metadata; python_version > "3.10"
 Provides-Extra: docs
+Requires-Dist: sphinx; extra == "docs"
 
 # JanusReader
 
-**Current version:** 0.6.1 
+**Current version:** 0.8.0 
 
-**janusReader** is the offical Python library to read data coming from JANUS instrument on-board the ESA mission JUICE.
+**JanusReader** is the offical Python library to read data coming from JANUS instrument on-board the ESA mission JUICE.
+
+## Installation
+
+```shell
+$ python3 -m pip install JanusReader
+```
 
 ## Usage
 
@@ -18,5 +30,4 @@ Provides-Extra: docs
 from JanusReader import JanusReader as JR
 
 dat = JR("datafile.vic")
-
 ```

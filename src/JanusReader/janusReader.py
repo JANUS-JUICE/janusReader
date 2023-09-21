@@ -38,9 +38,7 @@ def getValue(nodeList: md.Element, label: str) -> str:
     # for item in nodeList:
     #     print(item)
     elem = nodeList.getElementsByTagName(label)
-    # try: console
-    # except:
-    #     from JanusReader.console import console
+   
     if len(elem) == 0:
         cons.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
         return None
