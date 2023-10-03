@@ -1,5 +1,9 @@
 # JanusReader
 
+## Version 0.9.0
+
+- fix exposure keyword
+
 ## Version 0.8.0
 
 - read modified datamodels with warnings
