@@ -294,7 +294,7 @@ class JanusReader:
         self.onGroundProcessing=None
         self.HK=None
         self.Downsamplig=None
-        self.Exposure = getValue(idObs, 'img:exposure_duration', float)
+        self.Exposure = getValue(idObs, 'img:exposure_duration')
         self.onBoardCompression=None
         self.subFrame = SubFrame(getElement(doc, 'img:Subframe'))
         self.Header=None
@@ -304,10 +304,10 @@ class JanusReader:
         flObs = getElement(doc, 'pds:File_Area_Observational')
         self.creationDate = getValue(flObs, 'pds:creation_date_time')
         img = getElement(flObs, "pds:Array_2D_Image")
-        self.Offset = getValue(img, "pds:offset", int)
+        self.Offset = getValue(img, "pds:offset")
         elem = img.getElementsByTagName("pds:Axis_Array")
-        self.Samples = getValue(elem[1], "pds:elements",int)
-        self.Lines = getValue(elem[0], "pds:elements", int)
+        self.Samples = getValue(elem[1], "pds:elements")
+        self.Lines = getValue(elem[0], "pds:elements")
         # console.print(timeCoord)
 
             
