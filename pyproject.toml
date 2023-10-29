@@ -11,9 +11,11 @@ authors = [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" },
     {name="Luca Penasa", email = "Luca.Penasa@inaf.it"}
 ]
 license = {text = "GNU GPL ver3"} 
-mantainers= [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" },
+
+maintainers= [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" },
     {name="Luca Penasa", email = "Luca.Penasa@inaf.it"}
 ]
+
 readme = "README.md"
 
 classifiers = [

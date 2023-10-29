@@ -1,7 +1,8 @@
 Metadata-Version: 2.1
 Name: JanusReader
-Version: 0.9.0
+Version: 0.9.1
 Author-email: Romolo Politi <Romolo.Politi@inaf.it>, Luca Penasa <Luca.Penasa@inaf.it>
+Maintainer-email: Romolo Politi <Romolo.Politi@inaf.it>, Luca Penasa <Luca.Penasa@inaf.it>
 License: GNU GPL ver3
 Project-URL: Repository, https://github.com/JANUS-JUICE/janusReader
 Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
@@ -14,9 +15,12 @@ Requires-Dist: sphinx; extra == "docs"
 
 # JanusReader
 
-**Current version:** 0.9.0 
+![Version](https://img.shields.io/badge/version-0.9.1-blue)
+![DOI:10.5281/zenodo.10051173](https://zenodo.org/badge/DOI/10.5281/zenodo.10051173.svg)
 
 **JanusReader** is the offical Python library to read data coming from JANUS instrument on-board the ESA mission JUICE.
+
+**DOI:** [10.5281/zenodo.10051173](https://zenodo.org/doi/10.5281/zenodo.10051172)
 
 ## Installation
 
