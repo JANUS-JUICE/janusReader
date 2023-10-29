@@ -1,5 +1,9 @@
 # JanusReader
 
+## Version 0.9.1
+
+- fix some bug in the requirements
+ 
 ## Version 0.9.0
 
 - fix exposure keyword
