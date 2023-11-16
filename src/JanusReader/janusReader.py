@@ -264,7 +264,37 @@ class JanusReader:
             self.label_size = int(l[8:iblank])
             with open(self.fileName, 'rb') as f:
                 lbl = str(f.read(self.label_size).decode('latin-1'))
-            self.vicar = load_header(lbl)
+
+            self.vicar=load_header(lbl)
+
+            if self.vicar.get("EOL", False):
+                # we need to repeat label reading as above after computing the offset
+                # as this duplicates code we should refactor this to a single function.
+                cons.print(f"{MSG.DEBUG} The vicar file has labels at the end of the file.")
+                next_labels_offset = (self.vicar["LBLSIZE"] +
+                                      self.vicar["RECSIZE"] *
+                                      self.vicar["NLB"] +
+                                      self.vicar["RECSIZE"] *
+                                      self.vicar["N2"] *
+                                      self.vicar["N3"])
+                                        
+                with open(self.fileName, 'rb') as f:
+                    f.seek(next_labels_offset)
+                    l=str(f.read(40).decode('latin-1'))
+                    
+                if 'LBLSIZE' not in l:
+                    cons.print(f"{MSG.ERROR} Expected lables at end of file "
+                               "but could not find LBLSIZE. "
+                               "vicar labels might be incomplete.")
+                else:
+                    iblank = l.index(" ", 8)
+                    self.eol_label_size = int(l[8:iblank])
+                    with open(self.fileName, 'rb') as f:
+                        f.seek(next_labels_offset)
+                        lbl = str(f.read(self.label_size).decode('latin-1'))
+                        
+                    self.vicar.update(load_header(lbl))
+
         # Read the PDS4 Label
         self.labelFile = self.fileName.with_suffix('.xml')
 
