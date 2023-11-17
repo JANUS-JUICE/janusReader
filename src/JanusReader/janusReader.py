@@ -14,7 +14,7 @@ from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 
 
-__version__ = "0.9.0"
+__version__ = "0.9.2"
 
 
 class MSG:
@@ -357,8 +357,8 @@ class JanusReader:
         tb.add_row("Phase Name", '', self.phaseName)
         tb.add_row("Phase ID", '', self.phaseID)
         tb.add_section()
-        tb.add_row("Start Orbit", "", self.startOrbit)
-        tb.add_row("End Orbit", "", self.endOrbit)
+        tb.add_row("Start Orbit", "", str(self.startOrbit))
+        tb.add_row("End Orbit", "", str(self.endOrbit))
         tb.add_section()
         tb.add_row("Pointing Mode", "", self.pointingMode)
         tb.add_row("Observation Identifier", "", self.obsIdentifier)

@@ -1,5 +1,9 @@
 # JanusReader
 
+## Version 0.9.2
+
+- fix bug in Show method
+
 ## Version 0.9.1
 
 - fix some bug in the requirements
