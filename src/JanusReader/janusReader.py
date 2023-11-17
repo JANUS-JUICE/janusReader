@@ -14,7 +14,7 @@ from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 
 
-__version__ = "0.9.2"
+__version__ = "0.10.0"
 
 
 class MSG:
@@ -117,17 +117,36 @@ class InstrumentState:
                        '', f"{item.value} {item.unit}")
         return tb
 
+class Filter:
+    def __init__(self,filter):
+        self.filterName = getValue(filter, "img:filter_name")
+        self.filtNumber = getValue(filter, "img:filter_number")
+        self.bandwidth = getValue(filter, "img:bandwidth")
+        self.filterWavelength=getValue(filter,"img:center_filter_wavelength")
+        
+    def Show(self):
+        tb = Table(expand=False, show_header=False,
+                   show_lines=False, box=box.SIMPLE_HEAD,
+                   title="Filters Parameters", title_style="italic yellow")
+        tb.add_column(style='yellow', justify='left')
+        tb.add_column()
+        tb.add_column()
+        tb.add_row("Filter Name", "", self.filterName)
+        tb.add_row("Filter Number", "", str(self.filtNumber))
+        tb.add_row("Bandwidth",'',f"{str(self.bandwidth)} nm")
+        tb.add_row("Filter Center wavelegth",'',f"{str(self.filterWavelength)} nm")
+        
+        return tb
 
 class AcquisitionParameter:
     def __init__(self, acq):
-        self.frontDoor = getValue(acq, "juice_janus:front_door_status")
+        self.coverStatusHW = getValue(acq, "juice_janus:cover_status_hw")
+        self.coverStatusSW = getValue(acq, "juice_janus:cover_status_sw")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
         self.imgNum = getValue(acq, 'juice_janus:image_number')
-        self.filtNumber = getValue(acq, "juice_janus:filter_number")
-        self.filterName = getValue(acq, "juice_janus:filter_name")
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
-        self.filSnapin = getValue(acq, "juice_janus:filter_snapin")
+        self.filSnapin = getValue(acq, "juice_janus:filter_wheel_snapin")
         self.multifilter = None
         pass
 
@@ -138,14 +157,13 @@ class AcquisitionParameter:
         tb.add_column(style='yellow', justify='left')
         tb.add_column()
         tb.add_column()
-        tb.add_row("Front Door Status", "", self.frontDoor)
+        tb.add_row("Cover Status Hardware", "", self.coverStatusHW)
+        tb.add_row("Cover Status Software", "", self.coverStatusSW)
         tb.add_row("Instrument Mode", "", self.instMode)
-        tb.add_row("Image Session ID", "", self.sessID)
+        tb.add_row("Image Session ID", "", str(self.sessID))
         tb.add_row("Image Number", "", str(self.imgNum))
-        tb.add_row("Filter Number", "", str(self.filtNumber))
-        tb.add_row("Filter Name", "", self.filterName)
         tb.add_row("Filter Wheel Direction", "", self.filWheelDir)
-        tb.add_row("Filter Snapin", "", self.filSnapin)
+        tb.add_row("Filter Snapin", "", str(self.filSnapin))
         tb.add_row("Multifilter", "", str(self.multifilter))
         return tb
 
@@ -300,6 +318,9 @@ class JanusReader:
         context = getElement(idObs, 'psa:Observation_Context')
         self.pointingMode = getValue(context, 'psa:instrument_pointing_mode')
         self.obsIdentifier = getValue(context, 'psa:observation_identifier')
+        
+        filter = getElement(idObs, "img:Optical_Filter")
+        self.Filter=Filter(filter)
 
         acqPar = getElement(idObs, "juice_janus:Acquisition_Properties")
         self.AcquisitionParameter = AcquisitionParameter(acqPar)
@@ -370,7 +391,7 @@ class JanusReader:
         tb.add_row("On Board Compression", "", str(self.onBoardCompression))
         tb.add_row("Header", "", str(self.Header))
         if all:
-            col = Columns([tb, self.AcquisitionParameter.Show(), self.onBoardProcessing.Show(
+            col = Columns([tb, self.Filter.Show(),self.AcquisitionParameter.Show(), self.onBoardProcessing.Show(
             ), self.subFrame.Show(), self.instrumentState.Show()], expand=False)
         else:
             col = tb

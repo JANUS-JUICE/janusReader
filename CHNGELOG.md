@@ -1,5 +1,9 @@
 # JanusReader
 
+## Version 0.10.0
+
+- implement datamodel version 1.19
+
 ## Version 0.9.2
 
 - fix bug in Show method
