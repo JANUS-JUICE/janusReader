@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.10.1
+
+- fix bug in product version field
+
 ## Version 0.10.0
 
 - implement datamodel version 1.19

@@ -14,7 +14,7 @@ from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 
 
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 
 class MSG:
@@ -54,6 +54,10 @@ def getValue(nodeList: md.Element, label: str) -> str:
     #
     # Auto identification
     #
+    # exception
+    if 'version_id' in label:
+        return data
+    
     if data.isdigit():
         data = int(data)
     elif data.replace('.', '', 1).isdigit() and data.count('.') < 2:
@@ -140,12 +144,11 @@ class Filter:
 
 class AcquisitionParameter:
     def __init__(self, acq):
-        self.frontDoor = getValue(acq, "juice_janus:front_door_status")
+        self.coverStatusHW = getValue(acq, "juice_janus:cover_status_hw")
+        self.coverStatusSW = getValue(acq, "juice_janus:cover_status_sw")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
         self.imgNum = getValue(acq, 'juice_janus:image_number')
-        
-        
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
         self.filSnapin = getValue(acq, "juice_janus:filter_wheel_snapin")
         self.multifilter = None
@@ -158,12 +161,11 @@ class AcquisitionParameter:
         tb.add_column(style='yellow', justify='left')
         tb.add_column()
         tb.add_column()
-        tb.add_row("Front Door Status", "", self.frontDoor)
+        tb.add_row("Cover Status Hardware", "", self.coverStatusHW)
+        tb.add_row("Cover Status Software", "", self.coverStatusSW)
         tb.add_row("Instrument Mode", "", self.instMode)
         tb.add_row("Image Session ID", "", str(self.sessID))
         tb.add_row("Image Number", "", str(self.imgNum))
-        
-        
         tb.add_row("Filter Wheel Direction", "", self.filWheelDir)
         tb.add_row("Filter Snapin", "", str(self.filSnapin))
         tb.add_row("Multifilter", "", str(self.multifilter))

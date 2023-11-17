@@ -14,7 +14,7 @@ from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 
 
-__version__ = "0.10.0"
+__version__ = "0.10.1"
 
 
 class MSG:
@@ -54,6 +54,10 @@ def getValue(nodeList: md.Element, label: str) -> str:
     #
     # Auto identification
     #
+    # exception
+    if 'version_id' in label:
+        return data
+    
     if data.isdigit():
         data = int(data)
     elif data.replace('.', '', 1).isdigit() and data.count('.') < 2:
