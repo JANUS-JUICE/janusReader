@@ -1,8 +1,0 @@
-numpy
-rich
-
-[:python_version > "3.10"]
-importlib-metadata
-
-[docs]
-sphinx

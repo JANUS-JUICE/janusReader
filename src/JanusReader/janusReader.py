@@ -12,14 +12,14 @@ from rich.table import Table
 
 from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
+from datetime import datetime
 
-
-__version__ = "0.10.1"
+__version__ = "0.11.0"
 
 
 class MSG:
-    """Data class for the message labelling
-    """
+    """Data class for the message labelling"""
+
     DEBUG = "[blue][DEBUG][/blue]"
     WARNING = "[yellow][WARNING][/yellow]"
     ERROR = "[red][ERROR][/red]"
@@ -43,24 +43,26 @@ def getValue(nodeList: md.Element, label: str) -> str:
 
     if len(elem) == 0:
         cons.print(
-            f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
+            f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed."
+        )
         return None
 
     elif len(elem) > 1:
         cons.print(
-            f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen.")
+            f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen."
+        )
 
     data = elem[0].firstChild.data
     #
     # Auto identification
     #
     # exception
-    if 'version_id' in label:
+    if "version_id" in label:
         return data
-    
+
     if data.isdigit():
         data = int(data)
-    elif data.replace('.', '', 1).isdigit() and data.count('.') < 2:
+    elif data.replace(".", "", 1).isdigit() and data.count(".") < 2:
         data = float(data)
     #
     # if type:
@@ -89,11 +91,10 @@ def getElement(doc, label, el=0) -> md.Element:
 
 class State:
     def __init__(self, item):
-        self.name = getValue(item, 'img:device_name').lower()
-        self.value = getValue(item, 'img:temperature_value')
+        self.name = getValue(item, "img:device_name").lower()
+        self.value = getValue(item, "img:temperature_value")
 
-        self.unit = getElement(
-            item, 'img:temperature_value').getAttribute('unit')
+        self.unit = getElement(item, "img:temperature_value").getAttribute("unit")
 
 
 class InstrumentState:
@@ -110,37 +111,50 @@ class InstrumentState:
         return None
 
     def Show(self):
-        tb = Table(expand=False, show_header=False,
-                   show_lines=False, box=box.SIMPLE_HEAD,
-                   title="Instrument State", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Instrument State",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
         for item in self.states:
-            tb.add_row(' '.join(item.name.split('_')).title(),
-                       '', f"{item.value} {item.unit}")
+            tb.add_row(
+                " ".join(item.name.split("_")).title(), "", f"{item.value} {item.unit}"
+            )
         return tb
 
+
 class Filter:
-    def __init__(self,filter):
+    def __init__(self, filter):
         self.filterName = getValue(filter, "img:filter_name")
         self.filtNumber = getValue(filter, "img:filter_number")
         self.bandwidth = getValue(filter, "img:bandwidth")
-        self.filterWavelength=getValue(filter,"img:center_filter_wavelength")
-        
+        self.filterWavelength = getValue(filter, "img:center_filter_wavelength")
+
     def Show(self):
-        tb = Table(expand=False, show_header=False,
-                   show_lines=False, box=box.SIMPLE_HEAD,
-                   title="Filters Parameters", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Filters Parameters",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
         tb.add_row("Filter Name", "", self.filterName)
         tb.add_row("Filter Number", "", str(self.filtNumber))
-        tb.add_row("Bandwidth",'',f"{str(self.bandwidth)} nm")
-        tb.add_row("Filter Center wavelegth",'',f"{str(self.filterWavelength)} nm")
-        
+        tb.add_row("Bandwidth", "", f"{str(self.bandwidth)} nm")
+        tb.add_row("Filter Center wavelegth", "", f"{str(self.filterWavelength)} nm")
+
         return tb
+
 
 class AcquisitionParameter:
     def __init__(self, acq):
@@ -148,17 +162,22 @@ class AcquisitionParameter:
         self.coverStatusSW = getValue(acq, "juice_janus:cover_status_sw")
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
-        self.imgNum = getValue(acq, 'juice_janus:image_number')
+        self.imgNum = getValue(acq, "juice_janus:image_number")
         self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
         self.filSnapin = getValue(acq, "juice_janus:filter_wheel_snapin")
         self.multifilter = None
         pass
 
     def Show(self):
-        tb = Table(expand=False, show_header=False,
-                   show_lines=False, box=box.SIMPLE_HEAD,
-                   title="Acquisition Parameters", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Acquisition Parameters",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
         tb.add_row("Cover Status Hardware", "", self.coverStatusHW)
@@ -174,17 +193,22 @@ class AcquisitionParameter:
 
 class SubFrame:
     def __init__(self, proc) -> None:
-        self.firstLine = getValue(proc, 'img:first_line')
-        self.firstSample = getValue(proc, 'img:first_sample')
-        self.lines = getValue(proc, 'img:lines')
-        self.samples = getValue(proc, 'img:samples')
-        self.subFrameType = getValue(proc, 'img:subframe_type')
+        self.firstLine = getValue(proc, "img:first_line")
+        self.firstSample = getValue(proc, "img:first_sample")
+        self.lines = getValue(proc, "img:lines")
+        self.samples = getValue(proc, "img:samples")
+        self.subFrameType = getValue(proc, "img:subframe_type")
 
     def Show(self):
-        tb = Table(expand=False, show_header=False,
-                   show_lines=False, box=box.SIMPLE_HEAD,
-                   title="SubFrame Parameters", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="SubFrame Parameters",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
         tb.add_row("First Sample", "", str(self.firstSample))
@@ -196,26 +220,27 @@ class SubFrame:
 
 
 class OnBoardProcessing:
-
     def __init__(self, proc):
-        self.badPixelCorrection = getValue(
-            proc, 'juice_janus:bad_pixel_correction')
-        self.badPixelMapName = getValue(
-            proc, 'juice_janus:bad_pixel_map_name')
-        self.badPixelCount = getValue(proc, 'juice_janus:bad_pixel_count')
-        self.fpnCorrection = getValue(proc, 'juice_janus:fpn_correction')
-        self.fpnMapName = getValue(proc, 'juice_janus:fpn_map_name')
-        self.spikeMaximumValue = getValue(
-            proc, 'juice_janus:spike_maximum_value')
-        self.spikeDistance = getValue(proc, 'juice_janus:spike_distance')
-        self.spikeCount = getValue(proc, 'juice_janus:spike_count')
-        self.spikeCorrection = getValue(proc, 'juice_janus:spike_correction')
+        self.badPixelCorrection = getValue(proc, "juice_janus:bad_pixel_correction")
+        self.badPixelMapName = getValue(proc, "juice_janus:bad_pixel_map_name")
+        self.badPixelCount = getValue(proc, "juice_janus:bad_pixel_count")
+        self.fpnCorrection = getValue(proc, "juice_janus:fpn_correction")
+        self.fpnMapName = getValue(proc, "juice_janus:fpn_map_name")
+        self.spikeMaximumValue = getValue(proc, "juice_janus:spike_maximum_value")
+        self.spikeDistance = getValue(proc, "juice_janus:spike_distance")
+        self.spikeCount = getValue(proc, "juice_janus:spike_count")
+        self.spikeCorrection = getValue(proc, "juice_janus:spike_correction")
 
     def Show(self):
-        tb = Table(expand=False, show_header=False,
-                   show_lines=False, box=box.SIMPLE_HEAD,
-                   title="Onboard Processing", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Onboard Processing",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
         tb.add_row("Bad Pixels Correction", "", str(self.badPixelCorrection))
@@ -235,22 +260,30 @@ class OnBoardProcessing:
 class JanusReader:
     """Reader of the JANUS Data File
 
-        Args:
-            fileName (Path): input filename
-            cns (:obj:`Console`,optional): A console instance to capture output. Defaults to None.
+    Args:
+        fileName (Path): input filename
+        cns (:obj:`Console`,optional): A console instance to capture output. Defaults to None.
 
-        Attributes:
-            fileName (Path): input filename
-            img (np.array): image data
+    Attributes:
+        fileName (Path): input filename
+        img (np.array): image data
 
-        Raises:
-            NOT_VALID_VICAR_FILE
-                The input file ``fileName`` is not ion VICAR format.
-        """
+    Raises:
+        NOT_VALID_VICAR_FILE
+            The input file ``fileName`` is not ion VICAR format.
+    """
 
-    def __init__(self, fileName: Path, console: Console = None, debug: bool = False, vicar: bool = False):
+    def __init__(
+        self,
+        fileName: Path,
+        console: Console = None,
+        debug: bool = False,
+        vicar: bool = False,
+    ):
         # Check if console exists, if not create one
         global cons  # the variable will be global for the module
+        # definition of the dateformat
+        self._dateformat =  "%Y-%m-%dT%H:%M:%S.%fZ"
         if console is None:
             cons = Console()
         else:
@@ -261,70 +294,72 @@ class JanusReader:
             fileName = Path(fileName)
         self.fileName = fileName
         # Check the file extension
-        if self.fileName.suffix == '.vic':
+        if self.fileName.suffix == ".vic":
             if debug:
                 self.console.print(f"{MSG.DEBUG} Input type: Vicar file")
             if not self.fileName.exists():
-                raise FileNotFoundError(errno.ENOENT, os.strerror(
-                    errno.ENOENT), self.fileName.name)
-        elif self.fileName.suffix == '.xml':
+                raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), self.fileName.name
+                )
+        elif self.fileName.suffix == ".xml":
             if debug:
                 self.console.print(f"{MSG.DEBUG} Input type: XML file")
-            self.fileName = self.fileName.with_suffix('.vic')
+            self.fileName = self.fileName.with_suffix(".vic")
             if not self.fileName.exists():
-                raise FileNotFoundError(errno.ENOENT, os.strerror(
-                    errno.ENOENT), self.fileName.name)
+                raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), self.fileName.name
+                )
         # Read the Vicar Header
         if vicar:
             self.vicar = {}
-            with open(self.fileName, 'rb') as f:
-                l = str(f.read(40).decode('latin-1'))
+            with open(self.fileName, "rb") as f:
+                l = str(f.read(40).decode("latin-1"))
             # self.txt=l
-            if 'LBLSIZE' not in l:
-                raise NOT_VALID_VICAR_FILE('File is not a valid VICAR file')
+            if "LBLSIZE" not in l:
+                raise NOT_VALID_VICAR_FILE("File is not a valid VICAR file")
             iblank = l.index(" ", 8)
             self.label_size = int(l[8:iblank])
-            with open(self.fileName, 'rb') as f:
-                lbl = str(f.read(self.label_size).decode('latin-1'))
+            with open(self.fileName, "rb") as f:
+                lbl = str(f.read(self.label_size).decode("latin-1"))
             self.vicar = load_header(lbl)
         # Read the PDS4 Label
-        self.labelFile = self.fileName.with_suffix('.xml')
+        self.labelFile = self.fileName.with_suffix(".xml")
 
         doc = md.parse(self.labelFile.as_posix())
-        idArea = getElement(doc, 'pds:Identification_Area')
-        self.title = getValue(idArea, 'pds:title')
-        idModification = getElement(idArea, 'pds:Modification_Detail', -1)
-        self.prodVersion = getValue(idModification, 'pds:version_id')
-        idObs = getElement(doc, 'pds:Observation_Area')
-        if idObs.childNodes[1].nodeName == 'pds:comment':
+        idArea = getElement(doc, "pds:Identification_Area")
+        self.title = getValue(idArea, "pds:title")
+        idModification = getElement(idArea, "pds:Modification_Detail", -1)
+        self.prodVersion = getValue(idModification, "pds:version_id")
+        idObs = getElement(doc, "pds:Observation_Area")
+        if idObs.childNodes[1].nodeName == "pds:comment":
             self.dataDesc = idObs.childNodes[1].firstChild.nodeValue
-        timeCoord = getElement(idObs, 'pds:Time_Coordinates')
+        timeCoord = getElement(idObs, "pds:Time_Coordinates")
 
-        self.startDT = getValue(timeCoord, 'pds:start_date_time')
-        self.endDT = getValue(timeCoord, 'pds:stop_date_time')
+        self.startDT = datetime.strptime(getValue(timeCoord, "pds:start_date_time"),self._dateformat)
+        self.endDT = datetime.strptime(getValue(timeCoord, "pds:stop_date_time"),self._dateformat)
 
-        primaryRes = getElement(idObs, 'pds:Primary_Result_Summary')
-        self.level = getValue(primaryRes, 'pds:processing_level')
+        primaryRes = getElement(idObs, "pds:Primary_Result_Summary")
+        self.level = getValue(primaryRes, "pds:processing_level")
 
-        target = getElement(idObs, 'pds:Target_Identification')
-        self.target = getValue(target, 'pds:name')
+        target = getElement(idObs, "pds:Target_Identification")
+        self.target = getValue(target, "pds:name")
 
-        mission = getElement(idObs, 'pds:Mission_Area')
+        mission = getElement(idObs, "pds:Mission_Area")
 
-        info = getElement(mission, 'psa:Mission_Information')
-        self.startSC = getValue(mission, 'psa:spacecraft_clock_start_count')
-        self.endSC = getValue(mission, 'psa:spacecraft_clock_stop_count')
-        self.phaseName = getValue(mission, 'psa:mission_phase_name')
-        self.phaseID = getValue(mission, 'psa:mission_phase_identifier')
-        self.startOrbit = getValue(mission, 'psa:start_orbit_number')
-        self.endOrbit = getValue(mission, 'psa:stop_orbit_number')
+        info = getElement(mission, "psa:Mission_Information")
+        self.startSC = getValue(mission, "psa:spacecraft_clock_start_count")
+        self.endSC = getValue(mission, "psa:spacecraft_clock_stop_count")
+        self.phaseName = getValue(mission, "psa:mission_phase_name")
+        self.phaseID = getValue(mission, "psa:mission_phase_identifier")
+        self.startOrbit = getValue(mission, "psa:start_orbit_number")
+        self.endOrbit = getValue(mission, "psa:stop_orbit_number")
 
-        context = getElement(idObs, 'psa:Observation_Context')
-        self.pointingMode = getValue(context, 'psa:instrument_pointing_mode')
-        self.obsIdentifier = getValue(context, 'psa:observation_identifier')
-        
+        context = getElement(idObs, "psa:Observation_Context")
+        self.pointingMode = getValue(context, "psa:instrument_pointing_mode")
+        self.obsIdentifier = getValue(context, "psa:observation_identifier")
+
         filter = getElement(idObs, "img:Optical_Filter")
-        self.Filter=Filter(filter)
+        self.Filter = Filter(filter)
 
         acqPar = getElement(idObs, "juice_janus:Acquisition_Properties")
         self.AcquisitionParameter = AcquisitionParameter(acqPar)
@@ -333,16 +368,15 @@ class JanusReader:
         self.onGroundProcessing = None
         self.HK = None
         self.Downsamplig = None
-        exp = getElement(doc, 'img:Exposure')
-        self.Exposure = getValue(exp, 'img:exposure_duration')
+        exp = getElement(doc, "img:Exposure")
+        self.Exposure = getValue(exp, "img:exposure_duration")
         self.onBoardCompression = None
-        self.subFrame = SubFrame(getElement(doc, 'img:Subframe'))
+        self.subFrame = SubFrame(getElement(doc, "img:Subframe"))
         self.Header = None
-        self.instrumentState = InstrumentState(
-            getElement(doc, 'img:Instrument_State'))
+        self.instrumentState = InstrumentState(getElement(doc, "img:Instrument_State"))
         # self.image=None
-        flObs = getElement(doc, 'pds:File_Area_Observational')
-        self.creationDate = getValue(flObs, 'pds:creation_date_time')
+        flObs = getElement(doc, "pds:File_Area_Observational")
+        self.creationDate = datetime.strptime(getValue(flObs, "pds:creation_date_time"),self._dateformat[:-1])
         img = getElement(flObs, "pds:Array_2D_Image")
         self.Offset = getValue(img, "pds:offset")
         elem = img.getElementsByTagName("pds:Axis_Array")
@@ -351,36 +385,47 @@ class JanusReader:
         # console.print(timeCoord)
 
         # if self.Format == "HALF":
-        if self.level.lower() == 'raw':
-            with open(self.fileName, 'rb') as f:
+        if self.level.lower() == "raw":
+            with open(self.fileName, "rb") as f:
                 f.seek(self.Offset)
-                self.image = np.reshape(np.frombuffer(f.read(
-                    self.Lines * self.Samples * 2), dtype=np.uint16), (self.Lines, self.Samples))
+                self.image = np.reshape(
+                    np.frombuffer(
+                        f.read(self.Lines * self.Samples * 2), dtype=np.uint16
+                    ),
+                    (self.Lines, self.Samples),
+                )
         else:
-            with open(self.fileName, 'rb') as f:
-                self.image = np.reshape(np.frombuffer(
-                    f.read(), dtype=np.float32), (self.Lines, self.Samples))
+            with open(self.fileName, "rb") as f:
+                self.image = np.reshape(
+                    np.frombuffer(f.read(), dtype=np.float32),
+                    (self.Lines, self.Samples),
+                )
 
     def Show(self, all: bool = False):
-        """Print the contents of the VICAR file Label to the console.
-        """
-        tb = Table(expand=False, show_header=False, show_lines=False, box=box.SIMPLE_HEAD,
-                   title="General information", title_style="italic yellow")
-        tb.add_column(style='yellow', justify='left')
+        """Print the contents of the VICAR file Label to the console."""
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="General information",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
-        tb.add_row("Title:", '  ', self.title)
-        tb.add_row("Data Description", '', self.dataDesc)
-        tb.add_row("Processing Level", '', self.level)
+        tb.add_row("Title:", "  ", self.title)
+        tb.add_row("Data Description", "", self.dataDesc)
+        tb.add_row("Processing Level", "", self.level)
         tb.add_section()
-        tb.add_row("Start Time", '', self.startDT)
-        tb.add_row("End Time", '', self.endDT)
-        tb.add_row("Start Time SC Time", '', self.startSC)
-        tb.add_row("End Time SC Time", '', self.endSC)
+        tb.add_row("Start Time", "", self.startDT)
+        tb.add_row("End Time", "", self.endDT)
+        tb.add_row("Start Time SC Time", "", self.startSC)
+        tb.add_row("End Time SC Time", "", self.endSC)
         tb.add_section()
-        tb.add_row("Target Name", '', self.target)
-        tb.add_row("Phase Name", '', self.phaseName)
-        tb.add_row("Phase ID", '', self.phaseID)
+        tb.add_row("Target Name", "", self.target)
+        tb.add_row("Phase Name", "", self.phaseName)
+        tb.add_row("Phase ID", "", self.phaseID)
         tb.add_section()
         tb.add_row("Start Orbit", "", str(self.startOrbit))
         tb.add_row("End Orbit", "", str(self.endOrbit))
@@ -395,9 +440,24 @@ class JanusReader:
         tb.add_row("On Board Compression", "", str(self.onBoardCompression))
         tb.add_row("Header", "", str(self.Header))
         if all:
-            col = Columns([tb, self.Filter.Show(),self.AcquisitionParameter.Show(), self.onBoardProcessing.Show(
-            ), self.subFrame.Show(), self.instrumentState.Show()], expand=False)
+            col = Columns(
+                [
+                    tb,
+                    self.Filter.Show(),
+                    self.AcquisitionParameter.Show(),
+                    self.onBoardProcessing.Show(),
+                    self.subFrame.Show(),
+                    self.instrumentState.Show(),
+                ],
+                expand=False,
+            )
         else:
             col = tb
-        self.console.print(Panel(
-            col, title=f"Label for {self.fileName.name}", border_style='yellow', expand=False))
+        self.console.print(
+            Panel(
+                col,
+                title=f"Label for {self.fileName.name}",
+                border_style="yellow",
+                expand=False,
+            )
+        )

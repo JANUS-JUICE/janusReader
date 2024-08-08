@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.11.0
+
+- convert from string to datetime some fields...
+
 ## 0.10.1
 
 - fix bug in product version field
