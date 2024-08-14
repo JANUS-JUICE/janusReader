@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.11.1 14-08-2024
+
+- fix some bugs
+
 ## 0.11.0
 
 - convert from string to datetime some fields...

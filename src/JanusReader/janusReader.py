@@ -14,7 +14,7 @@ from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 from datetime import datetime
 
-__version__ = "0.12.0"
+__version__ = "0.11.1"
 
 
 class MSG:
