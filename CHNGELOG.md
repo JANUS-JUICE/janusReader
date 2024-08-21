@@ -1,5 +1,13 @@
 # JanusReader
 
+## 0.12.0 21-08-2024
+
+- load calibrated file
+- implement OnGround Processing
+- implement Processing Context
+- implement Skipped Calibrated Steps
+- add command line option for info
+
 ## 0.11.1 14-08-2024
 
 - fix some bugs

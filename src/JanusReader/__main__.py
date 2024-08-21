@@ -13,9 +13,16 @@ from rich.table import Table
 from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 from datetime import datetime
+import rich_click as click
 
-__version__ = "0.11.1"
+__version__ = "0.12.0"
 
+progEpilog = "- For any information or suggestion please contact " \
+    "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
+click.rich_click.FOOTER_TEXT = progEpilog
+click.rich_click.HEADER_TEXT = f"JANUS Data Reader, version [blue]{__version__}[/blue]"
+
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 
 class MSG:
     """Data class for the message labelling"""
@@ -256,7 +263,115 @@ class OnBoardProcessing:
         tb.add_row("Spike Correction", "", str(self.spikeCorrection))
         return tb
 
+class OnGroundProcessing:
+    
+    def __init__(self, proc):
+        self.aswTickLen = getValue(proc, "juice_janus:asw_tick_len")
+        self.peuTickLen = getValue(proc, "juice_janus:peu_tick_len")
+        self.lostPacketCount = getValue(proc, "juice_janus:lost_packets_count")
+        self.lostCmprsPixels = getValue(proc, "juice_janus:lost_cmprs_pixels")
+        
+    def Show(self):
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="On Ground Processing",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
+        tb.add_column()
+        tb.add_column()
+        tb.add_row("ASW Tick Length", "", str(self.aswTickLen))
+        tb.add_row("PEU Tick Length", "", str(self.peuTickLen))
+        tb.add_row("Lost Packets Count", "", str(self.lostPacketCount))
+        tb.add_row("Lost Compressed Pixels", "", str(self.lostCmprsPixels))
+        return tb
 
+class ProcessingInput:
+    
+    def __init__(self,proc):
+        self.processingInputType = getValue(proc, "psa:type")
+        self.processingInputFile = getValue(proc, "psa:file_name")
+        
+class ProcessingContext:
+    
+    def __init__(self,proc):
+        self.softwareTitle = getValue(proc, "psa:processing_software_title")
+        self.softwareVersion = getValue(proc, "psa:processing_software_version")
+        elem = proc.getElementsByTagName("psa:Processing_Input_Identification")
+        self.inputs = []
+        for item in elem:
+            self.inputs.append(ProcessingInput(item))
+    
+    def Get(self, name: str):
+        for item in self.inputs:
+            if item.name == name.lower():
+                return item.value
+        return None
+        
+    def Show(self):
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Processing Context",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
+        tb.add_column()
+        tb.add_column()
+        tb.add_row("Software Title", "", f"{self.softwareTitle} ({self.softwareVersion})")
+        for item in self.inputs:
+            tb.add_row(
+                item.processingInputType, "", f"{
+                    item.processingInputFile}"
+            )
+        
+        return tb
+
+class SkippedSteps:
+    
+    def __init__(self,code):
+        self.code=code
+        self.steps=[]
+        integer_value = int(code, 16)
+
+        # Convertire l'intero in una stringa binaria (rimuovendo il prefisso "0b")
+        binary_string = bin(integer_value)[2:]
+
+        # Aggiungere zeri iniziali per avere una lunghezza multipla di 4
+        # Questo è utile per rappresentare correttamente l'intera lunghezza del numero esadecimale
+        binary_string = binary_string.zfill(len(code) * 4)
+        steps_dec = ["Dead Pixels", "Bad Pixels", "Saturated Pixels",
+                     "Dark Correction", "Offset Correction", "Radiometric Correction"]
+        for index, bit in enumerate(binary_string):
+            if bit == "1":
+                self.steps.append(steps_dec[index])
+
+    def Show(self):
+        tb = Table(
+            expand=False,
+            show_header=False,
+            show_lines=False,
+            box=box.SIMPLE_HEAD,
+            title="Skipped Calibration Steps",
+            title_style="italic yellow",
+        )
+        tb.add_column(style="yellow", justify="left")
+        tb.add_column()
+        tb.add_column()
+        if len(self.steps)==0:
+            tb.add_row("No calibration steps skipped", "", "")
+        else:
+            for idx,item in enumerate(self.steps):
+                tb.add_row(
+                    str(idx), "", item
+                )
+        return tb
+    
 class JanusReader:
     """Reader of the JANUS Data File
 
@@ -304,13 +419,23 @@ class JanusReader:
         elif self.fileName.suffix == ".xml":
             if debug:
                 self.console.print(f"{MSG.DEBUG} Input type: XML file")
-            self.fileName = self.fileName.with_suffix(".vic")
+            if 'raw' in self.fileName.name:
+                self.fileName = self.fileName.with_suffix(".vic")
+            elif 'cal' in self.fileName.name:
+                self.fileName = self.fileName.with_suffix(".dat")
+            if not self.fileName.exists():
+                raise FileNotFoundError(
+                    errno.ENOENT, os.strerror(errno.ENOENT), self.fileName.name
+                )
+        elif self.fileName.suffix == ".dat":
+            if debug:
+                self.console.print(f"{MSG.DEBUG} Input type: Calibrated Data file")
             if not self.fileName.exists():
                 raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), self.fileName.name
                 )
         # Read the Vicar Header
-        if vicar:
+        if vicar and self.fileName.suffix != ".dat":
             self.vicar = {}
             with open(self.fileName, "rb") as f:
                 l = str(f.read(40).decode("latin-1"))
@@ -322,6 +447,15 @@ class JanusReader:
             with open(self.fileName, "rb") as f:
                 lbl = str(f.read(self.label_size).decode("latin-1"))
             self.vicar = load_header(lbl)
+        elif vicar and self.fileName.suffix == ".dat":
+            self.console.print(f"{MSG.WARNING} The file is a calibrated data file. VICAR option ignored.")
+        
+        if self.fileName.suffix == ".dat":
+            parts = self.fileName.name.split("_")
+            code=parts[-4][1:]
+            self.skippedCalibrationSteps=SkippedSteps(code)
+        else:
+            self.skippedCalibrationSteps=None
         # Read the PDS4 Label
         self.labelFile = self.fileName.with_suffix(".xml")
 
@@ -365,7 +499,10 @@ class JanusReader:
         self.AcquisitionParameter = AcquisitionParameter(acqPar)
         obProc = getElement(idObs, "juice_janus:Onboard_Processing")
         self.onBoardProcessing = OnBoardProcessing(obProc)
-        self.onGroundProcessing = None
+        grProc=getElement(idObs, "juice_janus:Onground_Processing")
+        self.onGroundProcessing = OnGroundProcessing(grProc)
+        self.proceesingContext = ProcessingContext(
+            getElement(idObs, "psa:Processing_Context"))
         self.HK = None
         self.Downsamplig = None
         exp = getElement(doc, "img:Exposure")
@@ -376,12 +513,16 @@ class JanusReader:
         self.instrumentState = InstrumentState(getElement(doc, "img:Instrument_State"))
         # self.image=None
         flObs = getElement(doc, "pds:File_Area_Observational")
-        self.creationDate = datetime.strptime(getValue(flObs, "pds:creation_date_time"),self._dateformat[:-1])
+        if fileName.suffix == ".vic":
+            self.creationDate = datetime.strptime(getValue(flObs, "pds:creation_date_time"),self._dateformat[:-1])
+        else:
+            self.creationDate = datetime.strptime(getValue(flObs, "pds:creation_date_time"), self._dateformat)
         img = getElement(flObs, "pds:Array_2D_Image")
         self.Offset = getValue(img, "pds:offset")
         elem = img.getElementsByTagName("pds:Axis_Array")
         self.Samples = getValue(elem[1], "pds:elements")
         self.Lines = getValue(elem[0], "pds:elements")
+        
         # console.print(timeCoord)
 
         # if self.Format == "HALF":
@@ -418,8 +559,8 @@ class JanusReader:
         tb.add_row("Data Description", "", self.dataDesc)
         tb.add_row("Processing Level", "", self.level)
         tb.add_section()
-        tb.add_row("Start Time", "", self.startDT)
-        tb.add_row("End Time", "", self.endDT)
+        tb.add_row("Start Time", "", str(self.startDT))
+        tb.add_row("End Time", "", str(self.endDT))
         tb.add_row("Start Time SC Time", "", self.startSC)
         tb.add_row("End Time SC Time", "", self.endSC)
         tb.add_section()
@@ -433,24 +574,25 @@ class JanusReader:
         tb.add_row("Pointing Mode", "", self.pointingMode)
         tb.add_row("Observation Identifier", "", self.obsIdentifier)
         tb.add_section()
-        tb.add_row("On Ground Processing", "", str(self.onGroundProcessing))
         tb.add_row("HK", "", str(self.HK))
         tb.add_row("Downsampling", "", str(self.Downsamplig))
         tb.add_row("Exposure", "", str(self.Exposure))
         tb.add_row("On Board Compression", "", str(self.onBoardCompression))
         tb.add_row("Header", "", str(self.Header))
         if all:
-            col = Columns(
-                [
-                    tb,
-                    self.Filter.Show(),
-                    self.AcquisitionParameter.Show(),
-                    self.onBoardProcessing.Show(),
-                    self.subFrame.Show(),
-                    self.instrumentState.Show(),
-                ],
-                expand=False,
-            )
+            elems = [
+                tb,
+                self.Filter.Show(),
+                self.AcquisitionParameter.Show(),
+                self.onBoardProcessing.Show(),
+                self.subFrame.Show(),
+                self.instrumentState.Show(),
+                self.onGroundProcessing.Show(),
+                self.proceesingContext.Show(),
+            ]
+            if self.skippedCalibrationSteps:
+                elems.append(self.skippedCalibrationSteps.Show())
+            col = Columns( elems,expand=False,)
         else:
             col = tb
         self.console.print(
@@ -461,3 +603,18 @@ class JanusReader:
                 expand=False,
             )
         )
+
+
+@click.command(context_settings=CONTEXT_SETTINGS)
+@click.argument("filename", type=click.Path(exists=True))
+@click.option("-a", "--all", is_flag=True, help="Print all the informations",default=False)
+@click.version_option(version=__version__)
+@click.option("-d", "--debug", is_flag=True, help="Debug mode",default=False)
+def action(filename,all:bool,debug:bool):
+    console=Console()
+    data = JanusReader(Path(filename), console=console, debug=debug)
+    data.Show(all=all)
+    pass
+
+if __name__ == "__main__":
+    action()

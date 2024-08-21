@@ -13,8 +13,8 @@ import traceback
 
 console=Console(record=True)
 # fileName='../../DATA2/03_-_SVT-1a/raw/janus_raw_sc_0734009714_000_13_1_0734009720_0000.vic'
-# fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/input/01/janus_raw_sc_0737553947_0000_01_1_0737553954_0000.vic'
-fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/input/janus_raw_sc_0737727420_0000_01_1_0737727440_0000.vic'
+fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/input/janus_raw_sc_0773586170_0180_01_20240706T131128_0000__1_0.vic'
+#fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/OUTPUT/janus_cal_sc_0773586170_0181_01_20240706T131130_0000__1_0.dat'
 
 try:
     data = jr(Path(fileName),console=console, debug=True,vicar=True)
@@ -26,7 +26,7 @@ except Exception as e:
     console.print(traceback.format_exc())
     sys.exit()
     
-console.print(data.vicar)
+# console.print(data.vicar)
 data.Show(all=True)
 
 # testFile=Path('../../DATA/SVT-1a/raw/janus_raw_sc_1_0734009714_000_13.vic')
