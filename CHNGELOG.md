@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.12.1 21-08-2024
+
+- fix bug for compatibility with python 3.10
+
 ## 0.12.0 21-08-2024
 
 - load calibrated file

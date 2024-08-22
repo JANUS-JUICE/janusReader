@@ -15,7 +15,7 @@ from JanusReader.vicar_head import load_header
 from datetime import datetime
 import rich_click as click
 
-__version__ = "0.12.0"
+__version__ = "0.12.1"
 
 progEpilog = "- For any information or suggestion please contact " \
     "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
@@ -326,8 +326,8 @@ class ProcessingContext:
         tb.add_row("Software Title", "", f"{self.softwareTitle} ({self.softwareVersion})")
         for item in self.inputs:
             tb.add_row(
-                item.processingInputType, "", f"{
-                    item.processingInputFile}"
+                item.processingInputType, "", 
+                f"{item.processingInputFile}"
             )
         
         return tb

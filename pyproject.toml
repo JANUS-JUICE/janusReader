@@ -1,6 +1,6 @@
 [project]
 name = "JanusReader"
-version = "0.12.0"
+version = "0.12.1"
 description="Python Reader for the data from JANUS instrument suite on-board the ESA mission JUICE"
 dependencies = [
     "numpy",
