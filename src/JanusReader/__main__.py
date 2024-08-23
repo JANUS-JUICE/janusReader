@@ -15,7 +15,7 @@ from JanusReader.vicar_head import load_header
 from datetime import datetime
 import rich_click as click
 
-__version__ = "0.12.1"
+__version__ = "0.12.2"
 
 progEpilog = "- For any information or suggestion please contact " \
     "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
@@ -347,7 +347,7 @@ class SkippedSteps:
         binary_string = binary_string.zfill(len(code) * 4)
         steps_dec = ["Dead Pixels", "Bad Pixels", "Saturated Pixels",
                      "Dark Correction", "Offset Correction", "Radiometric Correction"]
-        for index, bit in enumerate(binary_string):
+        for index, bit in enumerate(binary_string[::-1]):
             if bit == "1":
                 self.steps.append(steps_dec[index])
 
@@ -368,7 +368,7 @@ class SkippedSteps:
         else:
             for idx,item in enumerate(self.steps):
                 tb.add_row(
-                    str(idx), "", item
+                    str(idx+1), "", item
                 )
         return tb
     
@@ -610,10 +610,21 @@ class JanusReader:
 @click.option("-a", "--all", is_flag=True, help="Print all the informations",default=False)
 @click.version_option(version=__version__)
 @click.option("-d", "--debug", is_flag=True, help="Debug mode",default=False)
-def action(filename,all:bool,debug:bool):
+@click.option("-s","--show-skipped-process","proc",is_flag=True,help="Show the processing steps",default=False)
+def action(filename,all:bool,debug:bool,proc:bool):
     console=Console()
-    data = JanusReader(Path(filename), console=console, debug=debug)
-    data.Show(all=all)
+    filename=Path(filename)
+    data = JanusReader(filename, console=console, debug=debug)
+    if proc:
+        if data.skippedCalibrationSteps:
+            console.print(data.skippedCalibrationSteps.Show())
+        else:
+            if data.fileName.suffix == ".dat":
+                console.print("No calibration steps skipped")
+            else:
+                console.print("[yellow]]Not a calibrated data file[/yellow]")
+    else:
+        data.Show(all=all)
     pass
 
 if __name__ == "__main__":

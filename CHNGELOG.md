@@ -1,5 +1,10 @@
 # JanusReader
 
+## 0.12.2 23-08-2024
+
+- fix some bugs in the definition of the skipped calibration process
+- add --show-skipped-process option in the command line front-end
+
 ## 0.12.1 21-08-2024
 
 - fix bug for compatibility with python 3.10
