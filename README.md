@@ -5,7 +5,7 @@
 
 **JanusReader** is the offical Python library to read data coming from JANUS instrument on-board the ESA mission JUICE.
 
-**DOI:** [10.5281/zenodo.10051173](https://zenodo.org/doi/10.5281/zenodo.13364878)
+**DOI:** [10.5281/zenodo.13364878](https://zenodo.org/doi/10.5281/zenodo.13364878)
 
 ## Installation
 
