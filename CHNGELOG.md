@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.13.0 09-06-2025
+
+- changed the label suffix from xml to lblx
+
 ## 0.12.2 23-08-2024
 
 - fix some bugs in the definition of the skipped calibration process

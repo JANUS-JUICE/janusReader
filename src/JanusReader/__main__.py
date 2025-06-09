@@ -15,7 +15,7 @@ from JanusReader.vicar_head import load_header
 from datetime import datetime
 import rich_click as click
 
-__version__ = "0.12.2"
+__version__ = "0.13.0"
 
 progEpilog = "- For any information or suggestion please contact " \
     "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
@@ -416,7 +416,7 @@ class JanusReader:
                 raise FileNotFoundError(
                     errno.ENOENT, os.strerror(errno.ENOENT), self.fileName.name
                 )
-        elif self.fileName.suffix == ".xml":
+        elif self.fileName.suffix in [".xml", ".lblx"]:
             if debug:
                 self.console.print(f"{MSG.DEBUG} Input type: XML file")
             if 'raw' in self.fileName.name:
@@ -457,7 +457,7 @@ class JanusReader:
         else:
             self.skippedCalibrationSteps=None
         # Read the PDS4 Label
-        self.labelFile = self.fileName.with_suffix(".xml")
+        self.labelFile = self.fileName.with_suffix(".lblx")
 
         doc = md.parse(self.labelFile.as_posix())
         idArea = getElement(doc, "pds:Identification_Area")
