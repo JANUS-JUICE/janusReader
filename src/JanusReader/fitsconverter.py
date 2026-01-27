@@ -5,6 +5,18 @@ import datetime
 import pandas as pd
 import os
 
+
+def get_data_path():
+    """
+    Get the path to the data directory
+
+    Returns
+    ___
+    Path
+        the path to the data directory
+    """
+    return pathlib.Path(__file__).parent
+
 def explode_janusreader_class(levels,results,obj,text=None,name=[]):
     
     for attr, value in obj.__dict__.items():
@@ -35,19 +47,8 @@ def exploded2list(levels,results,dateformat):
     fits_name = []
     fits_value = []
     for lv,rslt in zip(levels,results):
-        #print("")
-        #print(lv,rslt)
         
-        if len(lv) == 1:
-            name = lv[0]
-            if isinstance(rslt, pathlib.PurePath):
-                rslt = rslt.name
-            if isinstance(rslt,datetime.datetime):
-                rslt = rslt.strftime(dateformat)
-            value = rslt
-            fits_name.append(name)
-            fits_value.append(value)
-        elif lv[0] == "Filter" or lv[0] == "AcquisitionParameter" or lv[0] == "onBoardProcessing" or lv[0] == "onGroundProcessing" or lv[0] == "subFrame":
+        if lv[0] == "Filter" or lv[0] == "AcquisitionParameter" or lv[0] == "onBoardProcessing" or lv[0] == "onGroundProcessing" or lv[0] == "subFrame":
             
             name = lv[-1]
             value = rslt
@@ -78,20 +79,35 @@ def exploded2list(levels,results,dateformat):
                 fits_value.append(value)
                 continue
         elif lv[0] == 'skippedCalibrationSteps':
-            if lv[1] == 'code':
+            if rslt is None:
+                name = 'calcode'
+                value = "N/A"
+                fits_name.append(name)
+                fits_value.append(value)
+            elif lv[1] == 'code':
                 name = 'calcode'
                 value = rslt
                 fits_name.append(name)
                 fits_value.append(value)
             else:
                 calstep.append(rslt)
+        
+
+        elif len(lv) == 1:
+            name = lv[0]
+            if isinstance(rslt, pathlib.PurePath):
+                rslt = rslt.name
+            if isinstance(rslt,datetime.datetime):
+                rslt = rslt.strftime(dateformat)
+            value = rslt
+            fits_name.append(name)
+            fits_value.append(value)
             
         else:
             print("boh",lv,rslt)
 
     name = 'skipstep'
     value = calstep
-    
     fits_name.append(name)
     fits_value.append(value)
     name = 'califile'
@@ -108,8 +124,8 @@ def lblxname2fitsname(lblx,path):
 
     fitsname = []
     for x in lblx:
-        #print(x)
         tmp = fits_naming_convention.loc[fits_naming_convention['lblx']==x,"fits"]
+
         if pd.isna(tmp).item():
             fitsname.append(x)
         else:
@@ -119,12 +135,17 @@ def lblxname2fitsname(lblx,path):
 
 
 
-def to_fits(box,folder,dictionary):
+def to_fits(box,folder,dictionary = None):
+
+    if dictionary is None:
+        dictionary=os.path.join(get_data_path(),"janus_fits_dictionary.txt")
+
 
     levels = []
     results = []
     levels,results,_ = explode_janusreader_class(levels,results,box)
     fits_name_raw,fits_results = exploded2list(levels,results,box._dateformat)
+
     fits_name = lblxname2fitsname(fits_name_raw,dictionary)
 
     ####################################
