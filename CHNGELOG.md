@@ -1,5 +1,13 @@
 # JanusReader
 
+## 0.14.0 22-02-2026
+
+- fix the bug from (issue #5)[https://github.com/JANUS-JUICE/janusReader/issues/5]
+- ported the project to poetry
+- added to the project the optional dipendences *test*
+- written test to obtain a coverage of 91%
+- introduced the optional dependences *devel*
+
 ## 0.13.0 09-06-2025
 
 - changed the label suffix from xml to lblx

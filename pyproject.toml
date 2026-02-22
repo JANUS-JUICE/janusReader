@@ -1,39 +1,87 @@
 [project]
 name = "JanusReader"
-version = "0.13.0"
+version = "0.14.0"
 description="Python Reader for the data from JANUS instrument suite on-board the ESA mission JUICE"
+requires-python = ">=3.14,<4"
 dependencies = [
-    "numpy",
-    "rich",
-    "rich_click",
-    'importlib-metadata; python_version>"3.10"',
+    "rich-click (>=1.9.7,<2.0.0)",
+    "numpy (>=2.4.2,<3.0.0)",
+
+
 ]
 
 authors = [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" },
     {name="Luca Penasa", email = "Luca.Penasa@inaf.it"}
 ]
-license = {text = "GNU GPL ver3"} 
+license = "GPL-3.0-only"
 
 maintainers= [{name="Romolo Politi", email ="Romolo.Politi@inaf.it" },
     {name="Luca Penasa", email = "Luca.Penasa@inaf.it"}
+]
+keywords = [
+    "ESA",
+    "Space Missions",
+    "JUICE",
+    "JANUS",
+    "Jupiter"
 ]
 
 readme = "README.md"
 
 classifiers = [
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3.14"
 ]
 
 [project.urls]
 Repository = "https://github.com/JANUS-JUICE/janusReader"
 
 [project.scripts]
-janusReader = "JanusReader.__main__:action"
+janusReader = "JanusReader.core:action"
 
 [project.optional-dependencies]
 docs = ["sphinx"]
 
-
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=2.0.0,<3.0.0", "meson", "ninja"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages =  [{include="JanusReader", from="src"}]
+
+[dependency-groups]
+devel = [
+    "ruff (>=0.15.2,<0.16.0)"
+]
+test = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-cov (>=7.0.0,<8.0.0)",
+    "coverage (>=7.13.4,<8.0.0)",
+    "coverage-lcov (>=0.3.0,<0.4.0)",
+    "pytest-rich (>=0.2.0,<0.3.0)",
+    "pyright (>=1.1.408,<2.0.0)",
+    "xdist (>=0.0.2,<0.0.3)"
+]
+
+[tool.pytest]
+minversion = "9.0"
+addopts = [
+    "--basetemp=/tmp/pytest",
+    "--verbosity=3", 
+    "--tb=line", 
+    "--capture=sys", 
+    "--show-capture=all",
+    "--cov=JanusReader",
+    "--cov-report=term",
+    "--cov-report=html:coverage/coverage_html",
+    "--cov-report=xml:coverage/coverage.xml", 
+    "--cov-report=json:coverage/coverage.json"
+]
+testpaths=[
+    "tests"
+]
+
+[tool.coverage.run]
+branch=true
+omit=["tests/*","run.py"]
