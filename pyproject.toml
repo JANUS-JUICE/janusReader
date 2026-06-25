@@ -1,11 +1,13 @@
 [project]
 name = "JanusReader"
-version = "0.14.0"
+version = "0.15.0"
 description="Python Reader for the data from JANUS instrument suite on-board the ESA mission JUICE"
 requires-python = ">=3.14,<4"
 dependencies = [
     "rich-click (>=1.9.7,<2.0.0)",
     "numpy (>=2.4.2,<3.0.0)",
+    "semantic-version-tools (>=1.4.1,<2.0.0)",
+    "myxmltools (>=0.2.0,<0.3.0)",
 
 
 ]
@@ -38,7 +40,7 @@ classifiers = [
 Repository = "https://github.com/JANUS-JUICE/janusReader"
 
 [project.scripts]
-janusReader = "JanusReader.core:action"
+janusReader = "JanusReader.cli:action"
 
 [project.optional-dependencies]
 docs = ["sphinx"]

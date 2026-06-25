@@ -13,19 +13,14 @@ from rich.table import Table
 from JanusReader.exceptions import NOT_VALID_VICAR_FILE
 from JanusReader.vicar_head import load_header
 from datetime import datetime
-import rich_click as click
+from semantic_version_tools import Vers
+from importlib.metadata import version as get_version
+from myxmltools import getValue, getElement
 
-__version__ = "0.13.0"
-click.rich_click.TEXT_MARKUP = "rich"
+installed_version = get_version('JanusReader')
+version=Vers(installed_version)
+__version__ = version.full()
 
-progEpilog = (
-    "- For any information or suggestion please contact "
-    "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
-)
-click.rich_click.FOOTER_TEXT = progEpilog
-click.rich_click.HEADER_TEXT = f"JANUS Data Reader, version [blue]{__version__}[/blue]"
-
-CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
 
 class MSG:
@@ -36,68 +31,68 @@ class MSG:
     ERROR = "[red][ERROR][/red]"
 
 
-def getValue(nodeList: md.Element, label: str) -> str:
-    """Get the value from a tag
+# def getValue(nodeList: md.Element, label: str) -> str:
+#     """Get the value from a tag
 
-    Args:
-        nodelist: The xml block to evaluate
-        label: The name of the tag to extract
-        type: The type of the value to return (will be casted if type is not None)
+#     Args:
+#         nodelist: The xml block to evaluate
+#         label: The name of the tag to extract
+#         type: The type of the value to return (will be casted if type is not None)
 
-    Returns:
-         The value of the tag, appropriately casted if type is not None
+#     Returns:
+#          The value of the tag, appropriately casted if type is not None
 
-    """
-    # for item in nodeList:
-    #     print(item)
-    elem = nodeList.getElementsByTagName(label)
+#     """
+#     # for item in nodeList:
+#     #     print(item)
+#     elem = nodeList.getElementsByTagName(label)
 
-    if len(elem) == 0:
-        cons.print(
-            f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed."
-        )
-        return None
+#     if len(elem) == 0:
+#         cons.print(
+#             f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed."
+#         )
+#         return None
 
-    elif len(elem) > 1:
-        cons.print(
-            f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen."
-        )
+#     elif len(elem) > 1:
+#         cons.print(
+#             f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen."
+#         )
 
-    data = elem[0].firstChild.data
-    #
-    # Auto identification
-    #
-    # exception
-    if "version_id" in label:
-        return data
+#     data = elem[0].firstChild.data
+#     #
+#     # Auto identification
+#     #
+#     # exception
+#     if "version_id" in label:
+#         return data
 
-    if data.isdigit():
-        data = int(data)
-    elif data.replace(".", "", 1).isdigit() and data.count(".") < 2:
-        data = float(data)
-    #
-    # if type:
-    #     return type(data)
+#     if data.isdigit():
+#         data = int(data)
+#     elif data.replace(".", "", 1).isdigit() and data.count(".") < 2:
+#         data = float(data)
+#     #
+#     # if type:
+#     #     return type(data)
 
-    return data
+#     return data
 
 
-def getElement(doc, label, el=0) -> md.Element:
-    """Get a Block of a dom
+# def getElement(doc, label, el=0) -> md.Element:
+#     """Get a Block of a dom
 
-    Args:
-        doc (xml.dom): The full Object
+#     Args:
+#         doc (xml.dom): The full Object
 
-        label (str): The name of the tag to extract
+#         label (str): The name of the tag to extract
 
-    Returns:
-        (xml.dom) The node tree extracted
+#     Returns:
+#         (xml.dom) The node tree extracted
 
-    Todo:
-        * implement OnBoard processing class
-    """
-    elem = doc.getElementsByTagName(label)
-    return elem[el]
+#     Todo:
+#         * implement OnBoard processing class
+#     """
+#     elem = doc.getElementsByTagName(label)
+#     return elem[el]
 
 
 class State:
@@ -470,35 +465,36 @@ class JanusReader:
         self.labelFile = self.fileName.with_suffix(".lblx")
 
         doc = md.parse(self.labelFile.as_posix())
-        idArea = getElement(doc, "pds:Identification_Area")
-        self.title = getValue(idArea, "pds:title")
-        idModification = getElement(idArea, "pds:Modification_Detail", -1)
-        self.prodVersion = getValue(idModification, "pds:version_id")
-        idObs = getElement(doc, "pds:Observation_Area")
-        if idObs.childNodes[1].nodeName == "pds:comment":
+        idArea = getElement(doc, "Identification_Area")
+        self.title = getValue(idArea, "title")
+        idModification = getElement(idArea, "Modification_Detail",)
+        self.prodVersion = getValue(idModification, "version_id")
+        idObs = getElement(doc, "Observation_Area")
+        if idObs.childNodes[1].nodeName == "comment":
             self.dataDesc = idObs.childNodes[1].firstChild.nodeValue
-        timeCoord = getElement(idObs, "pds:Time_Coordinates")
+        timeCoord = getElement(idObs, "Time_Coordinates")
 
         self.startDT = datetime.strptime(
-            getValue(timeCoord, "pds:start_date_time"), self._dateformat
+            getValue(timeCoord, "start_date_time"), self._dateformat
         )
         self.endDT = datetime.strptime(
-            getValue(timeCoord, "pds:stop_date_time"), self._dateformat
+            getValue(timeCoord, "stop_date_time"), self._dateformat
         )
 
-        primaryRes = getElement(idObs, "pds:Primary_Result_Summary")
-        self.level = getValue(primaryRes, "pds:processing_level")
+        primaryRes = getElement(idObs, "Primary_Result_Summary")
+        self.level = getValue(primaryRes, "processing_level")
 
-        target = getElement(idObs, "pds:Target_Identification")
-        self.target = getValue(target, "pds:name")
+        target = getElement(idObs, "Target_Identification")
+        self.target = getValue(target, "name")
 
-        mission = getElement(idObs, "pds:Mission_Area")
+        mission = getElement(idObs, "Mission_Area")
 
         info = getElement(mission, "psa:Mission_Information")
         self.startSC = getValue(mission, "psa:spacecraft_clock_start_count")
         self.endSC = getValue(mission, "psa:spacecraft_clock_stop_count")
-        self.phaseName = getValue(mission, "psa:mission_phase_name")
-        self.phaseID = getValue(mission, "psa:mission_phase_identifier")
+        phase = getElement(info, "psa:Mission_Phase")
+        self.phaseName = getValue(phase, "psa:name")
+        self.phaseID = getValue(phase, "psa:id")
         self.startOrbit = getValue(mission, "psa:start_orbit_number")
         self.endOrbit = getValue(mission, "psa:stop_orbit_number")
 
@@ -527,20 +523,20 @@ class JanusReader:
         self.Header = None
         self.instrumentState = InstrumentState(getElement(doc, "img:Instrument_State"))
         # self.image=None
-        flObs = getElement(doc, "pds:File_Area_Observational")
+        flObs = getElement(doc, "File_Area_Observational")
         if fileName.suffix == ".vic":
             self.creationDate = datetime.strptime(
-                getValue(flObs, "pds:creation_date_time"), self._dateformat[:-1]
+                getValue(flObs, "creation_date_time"), self._dateformat[:-1]
             )
         else:
             self.creationDate = datetime.strptime(
-                getValue(flObs, "pds:creation_date_time"), self._dateformat
+                getValue(flObs, "creation_date_time"), self._dateformat
             )
-        img = getElement(flObs, "pds:Array_2D_Image")
-        self.Offset = getValue(img, "pds:offset")
-        elem = img.getElementsByTagName("pds:Axis_Array")
-        self.Samples = getValue(elem[1], "pds:elements")
-        self.Lines = getValue(elem[0], "pds:elements")
+        img = getElement(flObs, "Array_2D_Image")
+        self.Offset = int(getValue(img, "offset"))
+        elem = img.getElementsByTagName("Axis_Array")
+        self.Samples = int(getValue(elem[1], "elements"))
+        self.Lines = int(getValue(elem[0], "elements"))
 
         # console.print(timeCoord)
 
@@ -627,33 +623,3 @@ class JanusReader:
         )
 
 
-@click.command(context_settings=CONTEXT_SETTINGS)
-@click.argument("filename", type=click.Path(exists=True))
-@click.option(
-    "-a", "--all", is_flag=True, help="Print all the informations", default=False
-)
-@click.version_option(version=__version__)
-@click.option("-d", "--debug", is_flag=True, help="Debug mode", default=False)
-@click.option(
-    "-s",
-    "--show-skipped-process",
-    "proc",
-    is_flag=True,
-    help="Show the processing steps",
-    default=False,
-)
-def action(filename, all: bool, debug: bool, proc: bool):
-    console = Console()
-    filename = Path(filename)
-    data = JanusReader(filename, console=console, debug=debug)
-    if proc:
-        if data.skippedCalibrationSteps:
-            console.print(data.skippedCalibrationSteps.Show())
-        else:
-            if data.fileName.suffix == ".dat":
-                console.print("No calibration steps skipped")
-            else:
-                console.print("[yellow]]Not a calibrated data file[/yellow]")
-    else:
-        data.Show(all=all)
-    pass

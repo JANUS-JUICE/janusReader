@@ -1,5 +1,11 @@
 # JanusReader
 
+## 0.15.0 25-06-2026
+
+- removed from the tags the pds dictionary name
+- introduced the cli module
+- fixed the type of integer values read from the xml file
+
 ## 0.14.0 22-02-2026
 
 - fix the bug from (issue #5)[https://github.com/JANUS-JUICE/janusReader/issues/5]
