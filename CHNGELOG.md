@@ -1,5 +1,17 @@
 # JanusReader
 
+## 0.16.2 01-07-2026
+
+- set solarDistance to None when the XML field is missing
+
+## 0.16.1 30-06-2026
+
+- fix typo
+
+## 0.16.0 30-06-2026
+
+- introduced the attribute solarDistance
+
 ## 0.15.0 25-06-2026
 
 - removed from the tags the pds dictionary name

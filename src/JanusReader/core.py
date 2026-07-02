@@ -523,6 +523,11 @@ class JanusReader:
         self.Header = None
         self.instrumentState = InstrumentState(getElement(doc, "img:Instrument_State"))
         # self.image=None
+        try:
+            distance = getElement(idObs, "geom:Distances")
+            self.solarDistance = getValue(distance, "geom:spacecraft_heliocentric_distance")
+        except IndexError:
+            self.solarDistance = None
         flObs = getElement(doc, "File_Area_Observational")
         if fileName.suffix == ".vic":
             self.creationDate = datetime.strptime(
