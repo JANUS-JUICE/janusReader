@@ -1,5 +1,11 @@
 # JanusReader
 
+## 0.16.3 06-07-2026
+
+- replaced `solarDistance` with `spacecraftSolarDistance`
+- introduced `targetSolarDistance`
+- set both attributes to `None` when the XML `Distances` element is missing
+
 ## 0.16.2 01-07-2026
 
 - set solarDistance to None when the XML field is missing

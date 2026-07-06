@@ -1,6 +1,6 @@
 # JanusReader
 
-![Version](https://img.shields.io/badge/version-0.16.2-blue)
+![Version](https://img.shields.io/badge/version-0.16.3-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13364878.svg)](https://doi.org/10.5281/zenodo.13364878)
 
 **JanusReader** is the official Python library to read data coming from the JANUS instrument on board the ESA mission JUICE.
@@ -20,9 +20,10 @@ from JanusReader import JanusReader as JR
 
 dat = JR("datafile.vic")
 
-# Spacecraft heliocentric distance from the product label.
-# The value is None when the field is not available.
-solar_distance = dat.solarDistance
+# Heliocentric distances from the product label.
+# Each value is None when the corresponding XML field is not available.
+spacecraft_solar_distance = dat.spacecraftSolarDistance
+target_solar_distance = dat.targetSolarDistance
 ```
 
 ### Command line
