@@ -164,8 +164,8 @@ class Filter:
 
 class AcquisitionParameter:
     def __init__(self, acq):
-        self.coverStatusHW = getValue(acq, "juice_janus:cover_status_hw")
-        self.coverStatusSW = getValue(acq, "juice_janus:cover_status_sw")
+        # cover_status_hw/sw: tm2raw no longer writes these under
+        # Acquisition_Properties -- dropped here to match.
         self.instMode = getValue(acq, "juice_janus:instrument_mode")
         self.sessID = getValue(acq, "juice_janus:image_session_id")
         self.imgNum = getValue(acq, "juice_janus:image_number")
@@ -186,8 +186,6 @@ class AcquisitionParameter:
         tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
-        tb.add_row("Cover Status Hardware", "", self.coverStatusHW)
-        tb.add_row("Cover Status Software", "", self.coverStatusSW)
         tb.add_row("Instrument Mode", "", self.instMode)
         tb.add_row("Image Session ID", "", str(self.sessID))
         tb.add_row("Image Number", "", str(self.imgNum))
