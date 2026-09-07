@@ -164,13 +164,12 @@ class Filter:
 
 class AcquisitionParameter:
     def __init__(self, acq):
-        # cover_status_hw/sw: tm2raw no longer writes these under
-        # Acquisition_Properties -- dropped here to match.
-        self.instMode = getValue(acq, "juice_janus:instrument_mode")
-        self.sessID = getValue(acq, "juice_janus:image_session_id")
-        self.imgNum = getValue(acq, "juice_janus:image_number")
-        self.filWheelDir = getValue(acq, "juice_janus:filter_wheel_direction")
-        self.filSnapin = getValue(acq, "juice_janus:filter_wheel_snapin")
+        # cover_status_hw/sw, instrument_mode, image_session_id,
+        # image_number, filter_wheel_direction, filter_wheel_snapin:
+        # tm2raw no longer writes these under Acquisition_Properties --
+        # dropped here to match. Display-only (JanusCal's calibration
+        # logic never references them), so nothing downstream needs a
+        # replacement value.
         self.multifilter = None
         pass
 
@@ -186,11 +185,6 @@ class AcquisitionParameter:
         tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
-        tb.add_row("Instrument Mode", "", self.instMode)
-        tb.add_row("Image Session ID", "", str(self.sessID))
-        tb.add_row("Image Number", "", str(self.imgNum))
-        tb.add_row("Filter Wheel Direction", "", self.filWheelDir)
-        tb.add_row("Filter Snapin", "", str(self.filSnapin))
         tb.add_row("Multifilter", "", str(self.multifilter))
         return tb
 
@@ -225,11 +219,10 @@ class SubFrame:
 
 class OnBoardProcessing:
     def __init__(self, proc):
-        self.badPixelCorrection = getValue(proc, "juice_janus:bad_pixel_correction")
-        self.badPixelMapName = getValue(proc, "juice_janus:bad_pixel_map_name")
+        # bad_pixel_correction/bad_pixel_map_name/fpn_correction/fpn_map_name:
+        # tm2raw no longer writes these under Onboard_Processing -- dropped
+        # here to match (display-only, see AcquisitionParameter above).
         self.badPixelCount = getValue(proc, "juice_janus:bad_pixel_count")
-        self.fpnCorrection = getValue(proc, "juice_janus:fpn_correction")
-        self.fpnMapName = getValue(proc, "juice_janus:fpn_map_name")
         self.spikeMaximumValue = getValue(proc, "juice_janus:spike_maximum_value")
         self.spikeDistance = getValue(proc, "juice_janus:spike_distance")
         self.spikeCount = getValue(proc, "juice_janus:spike_count")
@@ -247,12 +240,7 @@ class OnBoardProcessing:
         tb.add_column(style="yellow", justify="left")
         tb.add_column()
         tb.add_column()
-        tb.add_row("Bad Pixels Correction", "", str(self.badPixelCorrection))
-        tb.add_row("Bad Pixel Map Name", "", self.badPixelMapName)
         tb.add_row("Bad Pixel Count", "", str(self.badPixelCount))
-        tb.add_section()
-        tb.add_row("FPN Correction", "", str(self.fpnCorrection))
-        tb.add_row("FPN Map Name", "", self.fpnMapName)
         tb.add_section()
         tb.add_row("Spike Maximum Value", "", str(self.spikeMaximumValue))
         tb.add_row("Spike Distance", "", str(self.spikeDistance))
@@ -263,8 +251,9 @@ class OnBoardProcessing:
 
 class OnGroundProcessing:
     def __init__(self, proc):
+        # peu_tick_len: tm2raw no longer writes this under
+        # Onground_Processing -- dropped here to match (display-only).
         self.aswTickLen = getValue(proc, "juice_janus:asw_tick_len")
-        self.peuTickLen = getValue(proc, "juice_janus:peu_tick_len")
         self.lostPacketCount = getValue(proc, "juice_janus:lost_packets_count")
         self.lostCmprsPixels = getValue(proc, "juice_janus:lost_cmprs_pixels")
 
@@ -281,7 +270,6 @@ class OnGroundProcessing:
         tb.add_column()
         tb.add_column()
         tb.add_row("ASW Tick Length", "", str(self.aswTickLen))
-        tb.add_row("PEU Tick Length", "", str(self.peuTickLen))
         tb.add_row("Lost Packets Count", "", str(self.lostPacketCount))
         tb.add_row("Lost Compressed Pixels", "", str(self.lostCmprsPixels))
         return tb
