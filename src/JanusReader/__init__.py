@@ -1,2 +1,2 @@
-from JanusReader.__main__ import JanusReader, MSG
+from JanusReader.core import JanusReader, MSG
 from JanusReader import exceptions

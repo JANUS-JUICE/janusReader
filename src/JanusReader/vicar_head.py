@@ -1,26 +1,26 @@
-"""VICAR utilities
-"""
+"""VICAR utilities"""
 
-def load_header(header:str)->dict:
+
+def load_header(header: str) -> dict:
     """Creates a list of (keyword,value) pairs and saves them inside a dictionary.
-    
-        Args:
-            header (str): header of the image
-        
-        Returns:
-            dict: header intrepretated
+
+    Args:
+        header (str): header of the image
+
+    Returns:
+        dict: header intrepretated
     """
 
     # Internal method to parse one item starting at index i
     def _parse_single(i):
         while header[i] == " ":
-                i += 1
+            i += 1
 
         if header[i] == "'":
             i += 1
             j = i
             while header[j] != "'":
-                    j += 1
+                j += 1
 
             value = header[i:j]
             j += 1
@@ -28,12 +28,11 @@ def load_header(header:str)->dict:
             j = i
             is_float = False
             while True:
-
                 if header[j] in ",) ":
                     if is_float:
                         # Note use of decimal storage, so that printing a
                         # value afterward looks normal.
-                        value =float(header[i:j])
+                        value = float(header[i:j])
                     else:
                         value = int(header[i:j])
                     break
@@ -57,7 +56,7 @@ def load_header(header:str)->dict:
                 i += 1
 
             if header[i] == ")":
-                return (value, i+1)
+                return (value, i + 1)
 
             if header[i] == ",":
                 i += 1
@@ -65,9 +64,8 @@ def load_header(header:str)->dict:
     # Execution begins here
 
     ikey = 0
-    dat={}
+    dat = {}
     while True:
-
         # Extract the keyword
         jkey = header[ikey:].find("=") + ikey
         if jkey < ikey:
@@ -90,7 +88,7 @@ def load_header(header:str)->dict:
         else:
             (value, jvalue) = _parse_single(ivalue)
 
-        dat[keyword]=value
+        dat[keyword] = value
 
         ikey = jvalue
     return dat

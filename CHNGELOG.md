@@ -1,5 +1,37 @@
 # JanusReader
 
+## 0.16.3 06-07-2026
+
+- replaced `solarDistance` with `spacecraftSolarDistance`
+- introduced `targetSolarDistance`
+- set both attributes to `None` when the XML `Distances` element is missing
+
+## 0.16.2 01-07-2026
+
+- set solarDistance to None when the XML field is missing
+
+## 0.16.1 30-06-2026
+
+- fix typo
+
+## 0.16.0 30-06-2026
+
+- introduced the attribute solarDistance
+
+## 0.15.0 25-06-2026
+
+- removed from the tags the pds dictionary name
+- introduced the cli module
+- fixed the type of integer values read from the xml file
+
+## 0.14.0 22-02-2026
+
+- fix the bug from (issue #5)[https://github.com/JANUS-JUICE/janusReader/issues/5]
+- ported the project to poetry
+- added to the project the optional dipendences *test*
+- written test to obtain a coverage of 91%
+- introduced the optional dependences *devel*
+
 ## 0.13.0 09-06-2025
 
 - changed the label suffix from xml to lblx

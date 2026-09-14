@@ -13,7 +13,7 @@ import traceback
 
 console=Console(record=True)
 # fileName='../../DATA2/03_-_SVT-1a/raw/janus_raw_sc_0734009714_000_13_1_0734009720_0000.vic'
-fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/input/janus_raw_sc_0773586170_0180_01_20240706T131128_0000__1_0.vic'
+fileName = '../janus-raw2cal/input/janus_raw_sc_0777417466_0000_12__0_1.vic'
 #fileName = '/Users/romolo.politi/Documents/Progetti/JANUS/Software/janus-raw2cal/OUTPUT/janus_cal_sc_0773586170_0181_01_20240706T131130_0000__1_0.dat'
 
 try:
