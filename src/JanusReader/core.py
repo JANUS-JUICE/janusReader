@@ -4,7 +4,7 @@ import xml.dom.minidom as md
 from pathlib import Path
 
 import numpy as np
-from rich import box, print
+from rich import box
 from rich.columns import Columns
 from rich.console import Console
 from rich.panel import Panel
@@ -15,7 +15,6 @@ from JanusReader.vicar_head import load_header
 from datetime import datetime
 from semantic_version_tools import Vers
 from importlib.metadata import version as get_version
-from myxmltools import getValue, getElement
 
 installed_version = get_version('JanusReader')
 version=Vers(installed_version)
@@ -31,68 +30,45 @@ class MSG:
     ERROR = "[red][ERROR][/red]"
 
 
-# def getValue(nodeList: md.Element, label: str) -> str:
-#     """Get the value from a tag
-
-#     Args:
-#         nodelist: The xml block to evaluate
-#         label: The name of the tag to extract
-#         type: The type of the value to return (will be casted if type is not None)
-
-#     Returns:
-#          The value of the tag, appropriately casted if type is not None
-
-#     """
-#     # for item in nodeList:
-#     #     print(item)
-#     elem = nodeList.getElementsByTagName(label)
-
-#     if len(elem) == 0:
-#         cons.print(
-#             f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed."
-#         )
-#         return None
-
-#     elif len(elem) > 1:
-#         cons.print(
-#             f"{MSG.WARNING} More than one label {label}. The label might have been duplicated. This should never happen."
-#         )
-
-#     data = elem[0].firstChild.data
-#     #
-#     # Auto identification
-#     #
-#     # exception
-#     if "version_id" in label:
-#         return data
-
-#     if data.isdigit():
-#         data = int(data)
-#     elif data.replace(".", "", 1).isdigit() and data.count(".") < 2:
-#         data = float(data)
-#     #
-#     # if type:
-#     #     return type(data)
-
-#     return data
+cons = Console()
 
 
-# def getElement(doc, label, el=0) -> md.Element:
-#     """Get a Block of a dom
+def _get_elements(doc: md.Document | md.Element, label: str):
+    """Resolve unprefixed PDS tags in the product namespace, not other schemas."""
+    if ":" in label:
+        return doc.getElementsByTagName(label)
+    document = doc if isinstance(doc, md.Document) else doc.ownerDocument
+    namespace = document.documentElement.namespaceURI
+    return doc.getElementsByTagNameNS(namespace, label)
 
-#     Args:
-#         doc (xml.dom): The full Object
 
-#         label (str): The name of the tag to extract
+def getElement(doc: md.Document | md.Element, label: str, el: int = 0) -> md.Element:
+    """Select a descendant, including negative indices for the latest revision."""
+    elements = _get_elements(doc, label)
+    if not elements:
+        raise IndexError(f"Tag '{label}' not found")
+    return elements[el]
 
-#     Returns:
-#         (xml.dom) The node tree extracted
 
-#     Todo:
-#         * implement OnBoard processing class
-#     """
-#     elem = doc.getElementsByTagName(label)
-#     return elem[el]
+def getValue(nodeList: md.Document | md.Element, label: str) -> str | int | float | None:
+    """Read label values with JanusReader's historical conversion semantics."""
+    elements = _get_elements(nodeList, label)
+    if not elements:
+        cons.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
+        return None
+    if len(elements) > 1:
+        cons.print(f"{MSG.WARNING} More than one label {label}. The label might have been duplicated.")
+    data = "".join(
+        child.data for child in elements[0].childNodes
+        if child.nodeType in (child.TEXT_NODE, child.CDATA_SECTION_NODE)
+    ).strip()
+    if "version_id" in label:
+        return data
+    if data.isdigit():
+        return int(data)
+    if data.replace(".", "", 1).isdigit() and data.count(".") == 1:
+        return float(data)
+    return data
 
 
 class State:
@@ -392,7 +368,7 @@ class JanusReader:
             cons = Console()
         else:
             cons = console
-        self.console = console
+        self.console = cons
         # Check the file type, is str convert to Path
         if type(fileName) is not Path:
             fileName = Path(fileName)
@@ -427,12 +403,11 @@ class JanusReader:
         if vicar and self.fileName.suffix != ".dat":
             self.vicar = {}
             with open(self.fileName, "rb") as f:
-                l = str(f.read(40).decode("latin-1"))
-            # self.txt=l
-            if "LBLSIZE" not in l:
+                header_prefix = f.read(40).decode("latin-1")
+            if "LBLSIZE" not in header_prefix:
                 raise NOT_VALID_VICAR_FILE("File is not a valid VICAR file")
-            iblank = l.index(" ", 8)
-            self.label_size = int(l[8:iblank])
+            iblank = header_prefix.index(" ", 8)
+            self.label_size = int(header_prefix[8:iblank])
             with open(self.fileName, "rb") as f:
                 lbl = str(f.read(self.label_size).decode("latin-1"))
             self.vicar = load_header(lbl)
@@ -453,11 +428,11 @@ class JanusReader:
         doc = md.parse(self.labelFile.as_posix())
         idArea = getElement(doc, "Identification_Area")
         self.title = getValue(idArea, "title")
-        idModification = getElement(idArea, "Modification_Detail",)
+        idModification = getElement(idArea, "Modification_Detail", -1)
         self.prodVersion = getValue(idModification, "version_id")
         idObs = getElement(doc, "Observation_Area")
-        if idObs.childNodes[1].nodeName == "comment":
-            self.dataDesc = idObs.childNodes[1].firstChild.nodeValue
+        comments = _get_elements(idObs, "comment")
+        self.dataDesc = getValue(idObs, "comment") if comments else None
         timeCoord = getElement(idObs, "Time_Coordinates")
 
         self.startDT = datetime.strptime(
@@ -478,9 +453,14 @@ class JanusReader:
         info = getElement(mission, "psa:Mission_Information")
         self.startSC = getValue(mission, "psa:spacecraft_clock_start_count")
         self.endSC = getValue(mission, "psa:spacecraft_clock_stop_count")
-        phase = getElement(info, "psa:Mission_Phase")
-        self.phaseName = getValue(phase, "psa:name")
-        self.phaseID = getValue(phase, "psa:id")
+        try:
+            phase = getElement(info, "psa:Mission_Phase")
+        except IndexError:
+            self.phaseName = getValue(mission, "psa:mission_phase_name")
+            self.phaseID = getValue(mission, "psa:mission_phase_identifier")
+        else:
+            self.phaseName = getValue(phase, "psa:name")
+            self.phaseID = getValue(phase, "psa:id")
         self.startOrbit = getValue(mission, "psa:start_orbit_number")
         self.endOrbit = getValue(mission, "psa:stop_orbit_number")
 
@@ -517,17 +497,13 @@ class JanusReader:
             self.spacecraftSolarDistance = None
             self.targetSolarDistance = None
         flObs = getElement(doc, "File_Area_Observational")
-        if fileName.suffix == ".vic":
-            self.creationDate = datetime.strptime(
-                getValue(flObs, "creation_date_time"), self._dateformat[:-1]
-            )
-        else:
-            self.creationDate = datetime.strptime(
-                getValue(flObs, "creation_date_time"), self._dateformat
-            )
+        self.creationDate = datetime.strptime(
+            getValue(flObs, "creation_date_time").removesuffix("Z"),
+            self._dateformat[:-1],
+        )
         img = getElement(flObs, "Array_2D_Image")
         self.Offset = int(getValue(img, "offset"))
-        elem = img.getElementsByTagName("Axis_Array")
+        elem = _get_elements(img, "Axis_Array")
         self.Samples = int(getValue(elem[1], "elements"))
         self.Lines = int(getValue(elem[0], "elements"))
 
