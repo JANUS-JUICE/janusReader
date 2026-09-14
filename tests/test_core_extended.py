@@ -8,7 +8,8 @@ from click.testing import CliRunner
 from rich.console import Console
 
 import JanusReader.core as core
-from JanusReader.core import JanusReader, action, getElement, getValue
+from JanusReader.cli import action
+from JanusReader.core import JanusReader, getElement, getValue
 
 
 LBLX_TEMPLATE = """<?xml version='1.0' encoding='UTF-8'?>
