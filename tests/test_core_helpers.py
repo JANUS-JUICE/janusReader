@@ -38,3 +38,13 @@ def test_skipped_steps_decoding():
     steps = SkippedSteps("03")
 
     assert steps.steps == ["Dead Pixels", "Bad Pixels"]
+
+
+def test_unprefixed_pds_lookup_does_not_match_other_namespaces():
+    node = _node(
+        '<pds:root xmlns:pds="urn:nasa:pds" xmlns:psa="urn:esa:psa">'
+        '<psa:title>Wrong title</psa:title><pds:title>Product title</pds:title>'
+        '</pds:root>'
+    )
+
+    assert getValue(node, "title") == "Product title"

@@ -184,3 +184,41 @@ def test_invalid_vicar_header_raises(tmp_path: Path):
 
     with pytest.raises(NOT_VALID_VICAR_FILE):
         JanusReader(file_path, console=Console(), vicar=True)
+
+
+@pytest.mark.parametrize("default_namespace", [False, True])
+@pytest.mark.parametrize("creation_has_z", [False, True])
+def test_label_variants_preserve_metadata_and_pixels(
+    tmp_path: Path, default_namespace: bool, creation_has_z: bool
+):
+    file_path = tmp_path / "sample_raw_file.vic"
+    pixels = np.array([[11, 22]], dtype=np.uint16)
+    file_path.write_bytes(pixels.tobytes())
+    _write_lblx(file_path, "raw", 1, 2, 0, creation_has_z=creation_has_z)
+    label_path = file_path.with_suffix(".lblx")
+    label = label_path.read_text()
+    label = label.replace(
+        "<psa:Mission_Information />",
+        "<psa:Mission_Information><psa:Mission_Phase>"
+        "<psa:name>Encounter</psa:name><psa:id>ENC</psa:id>"
+        "</psa:Mission_Phase></psa:Mission_Information>",
+    ).replace(
+        "</pds:Identification_Area>",
+        "<pds:Modification_Detail><pds:version_id>02.00</pds:version_id>"
+        "</pds:Modification_Detail></pds:Identification_Area>",
+    ).replace("    <pds:comment>synthetic label</pds:comment>\n", "")
+    if default_namespace:
+        label = label.replace("xmlns:pds=", "xmlns=").replace("pds:", "")
+    label_path.write_text(label)
+
+    reader = JanusReader(label_path, debug=True)
+    reader.Show(all=True)
+
+    assert reader.prodVersion == "02.00"
+    assert reader.phaseName == "Encounter"
+    assert reader.phaseID == "ENC"
+    assert reader.dataDesc is None
+    assert reader.creationDate.isoformat() == "2025-01-01T00:00:02"
+    assert reader.startOrbit == 10
+    assert reader.Exposure == 12.5
+    assert np.array_equal(reader.image, pixels)
