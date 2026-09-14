@@ -7,7 +7,8 @@ click.rich_click.TEXT_MARKUP = "rich"
 
 progEpilog = (
     "- For any information or suggestion please contact "
-    "[bold magenta]Romolo.Politi@inaf.it[/bold magenta]"
+    "[bold magenta][link=mailto:Romolo.Politi@inaf.it]"
+    "Romolo.Politi@inaf.it[/link][/bold magenta]"
 )
 click.rich_click.FOOTER_TEXT = progEpilog
 click.rich_click.HEADER_TEXT = f"JANUS Data Reader, version [blue]{__version__}[/blue]"
