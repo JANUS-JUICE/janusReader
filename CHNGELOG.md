@@ -1,5 +1,18 @@
 # JanusReader
 
+## 0.18.0 09-10-2026
+
+- Stop reading `psa:stop_orbit_number` from the product label.
+- Remove the `JanusReader.endOrbit` attribute and the End Orbit row from the information display. `startOrbit` remains available.
+
+## 0.17.0 14-09-2026
+
+- Restore XML value conversion and namespace-aware PDS tag lookup.
+- Preserve version identifiers as strings and select the last modification entry for the product version.
+- Support both mission-phase label layouts and creation timestamps with or without a trailing `Z`.
+- Allow observation labels without a comment.
+- Fix Rich markup rendering in CLI headers and footers.
+
 ## 0.16.3 06-07-2026
 
 - replaced `solarDistance` with `spacecraftSolarDistance`
@@ -26,7 +39,7 @@
 
 ## 0.14.0 22-02-2026
 
-- fix the bug from (issue #5)[https://github.com/JANUS-JUICE/janusReader/issues/5]
+- fix the bug from [issue #5](https://github.com/JANUS-JUICE/janusReader/issues/5)
 - ported the project to poetry
 - added to the project the optional dipendences *test*
 - written test to obtain a coverage of 91%
