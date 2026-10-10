@@ -1,6 +1,6 @@
 [project]
 name = "JanusReader"
-version = "0.18.0"
+version = "0.18.1"
 description="Python Reader for the data from JANUS instrument suite on-board the ESA mission JUICE"
 requires-python = ">=3.14,<4"
 dependencies = [
@@ -46,11 +46,17 @@ janusReader = "JanusReader.cli:action"
 docs = ["sphinx"]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0", "meson", "ninja"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.11.26,<0.12.0"]
+build-backend = "uv_build"
 
-[tool.poetry]
-packages =  [{include="JanusReader", from="src"}]
+[tool.uv]
+default-groups = ["devel", "test"]
+
+[tool.uv.build-backend]
+module-name = "JanusReader"
+source-include = ["tests/**", "CHNGELOG.md", "CITATION.cff"]
+source-exclude = ["src/JanusReader/phases.py", "src/JanusReader/tools.py"]
+wheel-exclude = ["src/JanusReader/phases.py", "src/JanusReader/tools.py"]
 
 [dependency-groups]
 devel = [
@@ -63,7 +69,7 @@ test = [
     "coverage-lcov (>=0.3.0,<0.4.0)",
     "pytest-rich (>=0.2.0,<0.3.0)",
     "pyright (>=1.1.408,<2.0.0)",
-    "xdist (>=0.0.2,<0.0.3)"
+    "pytest-xdist (>=3.8.0,<4.0.0)"
 ]
 
 [tool.pytest]

@@ -219,6 +219,7 @@ def test_label_variants_preserve_metadata_and_pixels(
     assert reader.phaseID == "ENC"
     assert reader.dataDesc is None
     assert reader.creationDate.isoformat() == "2025-01-01T00:00:02"
-    assert reader.startOrbit == 10
+    assert not hasattr(reader, "startOrbit")
+    assert not hasattr(reader, "endOrbit")
     assert reader.Exposure == 12.5
     assert np.array_equal(reader.image, pixels)

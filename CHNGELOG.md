@@ -1,5 +1,13 @@
 # JanusReader
 
+## 0.18.1 09-10-2026
+
+- Stop reading `psa:start_orbit_number`; remove `startOrbit` and its information display row.
+- Migrate dependency management and packaging from Poetry to uv and `uv_build`, with `uv.lock` and Python 3.14 selection.
+- Install development and test dependency groups by default; replace `xdist` with the pytest plugin `pytest-xdist`.
+- Use uv for locked installation, tests, and builds in the release workflow.
+- Document local PyPI publication and GitHub release setup, credentials, triggers, and artifact selection.
+
 ## 0.18.0 09-10-2026
 
 - Stop reading `psa:stop_orbit_number` from the product label.

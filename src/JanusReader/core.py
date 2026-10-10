@@ -461,7 +461,7 @@ class JanusReader:
         else:
             self.phaseName = getValue(phase, "psa:name")
             self.phaseID = getValue(phase, "psa:id")
-        self.startOrbit = getValue(mission, "psa:start_orbit_number")
+        #self.startOrbit = getValue(mission, "psa:start_orbit_number")
         # self.endOrbit = getValue(mission, "psa:stop_orbit_number")
 
         context = getElement(idObs, "psa:Observation_Context")
@@ -552,7 +552,7 @@ class JanusReader:
         tb.add_row("Phase Name", "", self.phaseName)
         tb.add_row("Phase ID", "", self.phaseID)
         tb.add_section()
-        tb.add_row("Start Orbit", "", str(self.startOrbit))
+        # tb.add_row("Start Orbit", "", str(self.startOrbit))
         # tb.add_row("End Orbit", "", str(self.endOrbit))
         tb.add_section()
         tb.add_row("Pointing Mode", "", self.pointingMode)

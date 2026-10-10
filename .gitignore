@@ -1,0 +1,17 @@
+janusReader.code-workspace
+.env
+/venv
+/src/JanusReader.egg-info
+/build
+/dist
+src/JanusReader/phases.py
+/.vscode
+src/JanusReader/tools.py
+.coverage
+/coverage
+
+/.venv
+/.pytest_cache
+/.ruff_cache
+__pycache__/
+*.py[cod]
