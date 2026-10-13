@@ -53,7 +53,7 @@ def getElement(doc: md.Document | md.Element, label: str, el: int = 0) -> md.Ele
 def getValue(nodeList: md.Document | md.Element, label: str) -> str | int | float | None:
     """Read label values with JanusReader's historical conversion semantics."""
     elements = _get_elements(nodeList, label)
-    not_error=["geom:spacecraft_heliocentric_distance"]
+    not_error=["geom:target_heliocentric_distance"]
     if not elements and label not in not_error:
         cons.print(f"{MSG.WARNING} Missing label {label}. The label might have been removed or renamed.")
         return None

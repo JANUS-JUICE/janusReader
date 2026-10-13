@@ -1,6 +1,6 @@
 # JanusReader
 
-![Version](https://img.shields.io/badge/version-0.18.2-blue)
+![Version](https://img.shields.io/badge/version-0.18.3-blue)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13364878.svg)](https://doi.org/10.5281/zenodo.13364878)
 
 **JanusReader** is the official Python library for reading data from the JANUS instrument on board ESA's JUICE mission. It loads image pixels and metadata from the accompanying PDS4 label.
@@ -9,7 +9,7 @@
 
 ## Installation
 
-The current source version is **0.18.2** and requires **Python >=3.14,<4**.
+The current source version is **0.18.3** and requires **Python >=3.14,<4**.
 
 Install the published package:
 
@@ -60,7 +60,7 @@ print(product.startDT, product.endDT)
 product.Show()          # General product information
 product.Show(all=True)  # Includes processing and instrument metadata
 
-# Both distances are None when geom:Distances or the spacecraft distance is missing.
+# Both distances are None when geom:Distances or the target distance is missing.
 spacecraft_solar_distance = product.spacecraftSolarDistance
 target_solar_distance = product.targetSolarDistance
 ```
@@ -86,7 +86,7 @@ Attribute names are case-sensitive.
 
 Since 0.18.0, `psa:stop_orbit_number` is no longer read, `endOrbit` is no longer created, and the information display omits End Orbit. Since 0.18.1, `psa:start_orbit_number`, `startOrbit`, and the Start Orbit display row are also removed.
 
-Since 0.18.2, a missing `geom:spacecraft_heliocentric_distance` produces no missing-label warning. If `geom:Distances` or the spacecraft distance field is absent, the constructor sets both `spacecraftSolarDistance` and `targetSolarDistance` to `None`. If only `geom:target_heliocentric_distance` is absent, it emits a warning and sets `targetSolarDistance` to `None`, preserving the spacecraft distance.
+Since 0.18.3, a missing `geom:target_heliocentric_distance` produces no missing-label warning; a missing spacecraft distance produces a warning again. If `geom:Distances` or the target distance field is absent, the constructor sets both `spacecraftSolarDistance` and `targetSolarDistance` to `None`. If only `geom:spacecraft_heliocentric_distance` is absent, it emits a warning and sets `spacecraftSolarDistance` to `None`, preserving the target distance.
 
 Missing scalar label values generally produce a warning and return `None`; missing required XML structures can raise `IndexError`. Missing files raise `FileNotFoundError`, and malformed XML raises a parser error. With `vicar=True`, an invalid raw VICAR header raises `JanusReader.exceptions.NOT_VALID_VICAR_FILE`.
 
@@ -135,7 +135,7 @@ The repository's pytest configuration writes coverage reports under `coverage/`.
 
 Before each release, set the version with `uv version <version>` (or `uv version --bump patch`), and update the README version badge, changelog, and citation metadata to match. Commit the updated `pyproject.toml` and `uv.lock` together.
 
-For version 0.18.2:
+For version 0.18.3:
 
 ```shell
 uv sync --locked
@@ -148,7 +148,7 @@ uv build --no-sources
 Set `UV_PUBLISH_TOKEN` to a PyPI API token through your shell or secret manager, then upload only the artifacts for the intended version:
 
 ```shell
-uv publish dist/janusreader-0.18.2.tar.gz dist/janusreader-0.18.2-py3-none-any.whl
+uv publish dist/janusreader-0.18.3.tar.gz dist/janusreader-0.18.3-py3-none-any.whl
 ```
 
 Avoid a bare `uv publish` when `dist/` contains artifacts from older releases: it defaults to uploading all files in that directory. PyPI does not allow replacing an existing distribution filename with different contents; publish changed code under a new version.
@@ -160,7 +160,7 @@ The workflow [Upload Python Package](.github/workflows/python-publish.yml) start
 1. Commit and push the release changes, including the workflow and `uv.lock`.
 2. In the repository's **Settings → Secrets and variables → Actions**, create the repository secret `PYPI_API_TOKEN` with a PyPI token authorized to publish JanusReader, or verify that it is already configured.
 3. In **Actions → Upload Python Package**, enable the workflow if it is disabled.
-4. In **Releases → Draft a new release**, choose a tag matching the package version (for example, `v0.18.2`) and target the commit containing the release changes. Add release notes and select **Publish release**.
+4. In **Releases → Draft a new release**, choose a tag matching the package version (for example, `v0.18.3`) and target the commit containing the release changes. Add release notes and select **Publish release**.
 5. Follow the job in **Actions**. It installs Python 3.14 and locked dependencies, runs tests, builds the sdist and wheel with uv, and uploads them using `pypa/gh-action-pypi-publish` and the configured token.
 
 A push, a tag alone, or a saved release draft does not trigger this workflow. It has no `workflow_dispatch` trigger, so there is no manual **Run workflow** button. GitHub Pages and environment configuration are not required for this PyPI publication.

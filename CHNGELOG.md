@@ -1,5 +1,10 @@
 # JanusReader
 
+## 0.18.3 13-10-2026
+
+- Suppress the missing-label warning for `geom:target_heliocentric_distance` instead of `geom:spacecraft_heliocentric_distance`.
+- Restore the missing-label warning for `geom:spacecraft_heliocentric_distance`.
+
 ## 0.18.2 13-10-2026
 
 - Suppress the missing-label warning for `geom:spacecraft_heliocentric_distance`.
