@@ -1,5 +1,9 @@
 # JanusReader
 
+## 0.18.2 13-10-2026
+
+- Suppress the missing-label warning for `geom:spacecraft_heliocentric_distance`.
+
 ## 0.18.1 09-10-2026
 
 - Stop reading `psa:start_orbit_number`; remove `startOrbit` and its information display row.
